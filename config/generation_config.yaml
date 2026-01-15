@@ -1,0 +1,72 @@
+# Configuration for synthetic review generation
+
+# Number of reviews to generate
+num_reviews: 10
+
+# Rating distribution (should sum to 1.0)
+rating_distribution:
+  1: 0.05  # 5% - Very negative
+  2: 0.10  # 10% - Negative
+  3: 0.20  # 20% - Neutral
+  4: 0.35  # 35% - Positive
+  5: 0.30  # 30% - Very positive
+
+# Reviewer personas
+personas:
+  - name: "casual_buyer"
+    description: "Someone who buys shoes occasionally for everyday use"
+    traits:
+      - "focuses on comfort and price"
+      - "uses simple language"
+      - "mentions daily activities"
+    
+  - name: "athlete"
+    description: "Active person who uses shoes for sports and training"
+    traits:
+      - "emphasizes performance and durability"
+      - "mentions specific activities (running, gym, basketball)"
+      - "technical vocabulary about fit and support"
+    
+  - name: "fashion_conscious"
+    description: "Style-focused buyer who cares about appearance"
+    traits:
+      - "discusses aesthetics and trends"
+      - "mentions outfit matching"
+      - "uses fashion terminology"
+    
+  - name: "budget_shopper"
+    description: "Price-sensitive buyer looking for value"
+    traits:
+      - "emphasizes price and deals"
+      - "compares to other products"
+      - "mentions durability for the price"
+    
+  - name: "professional"
+    description: "Someone buying shoes for work environment"
+    traits:
+      - "focuses on professionalism and comfort for long hours"
+      - "mentions office or workplace context"
+      - "values quality and longevity"
+
+# Review characteristics
+review_length:
+  min_words: 5
+  max_words: 150
+
+# Temperature settings for generation
+generation_params:
+  temperature: 0.8
+  max_tokens: 200
+  top_p: 0.9
+
+# Product context (can be customized)
+product_context:
+  category: "shoes"
+  aspects:
+    - "comfort"
+    - "fit"
+    - "quality"
+    - "style"
+    - "durability"
+    - "price"
+    - "sizing"
