@@ -56,7 +56,7 @@ review_length:
 # Temperature settings for generation
 generation_params:
   temperature: 0.8
-  max_tokens: 200
+  max_tokens: 1000
   top_p: 0.9
 
 # Product context (can be customized)

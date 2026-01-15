@@ -16,7 +16,7 @@ def cli():
 
 @cli.command()
 @click.option('--num-reviews', '-n', type=int, help='Number of reviews to generate')
-@click.option('--provider', '-p', type=click.Choice(['openai', 'anthropic']), help='LLM provider to use')
+@click.option('--provider', '-p', type=click.Choice(['huggingface', 'gemini']), help='LLM provider to use')
 @click.option('--config', '-c', default='config/generation_config.yaml', help='Path to config file')
 @click.option('--output', '-o', default='data/generated_reviews.jsonl', help='Output file path')
 def generate(num_reviews, provider, config, output):
@@ -29,7 +29,8 @@ def generate(num_reviews, provider, config, output):
         num_reviews = cfg.get('num_reviews', 100)
     
     if provider is None:
-        provider = os.getenv('DEFAULT_PROVIDER', 'openai')
+        provider = os.getenv('DEFAULT_PROVIDER', 'huggingface')
+
     
     click.echo(f"\n🚀 Starting generation...")
     click.echo(f"   Reviews: {num_reviews}")
@@ -94,7 +95,7 @@ def stats(file):
 
 @cli.command()
 @click.option('--num-reviews', '-n', type=int, help='Number of reviews to generate')
-@click.option('--provider', '-p', type=click.Choice(['openai', 'anthropic']), help='LLM provider to use')
+@click.option('--provider', '-p', type=click.Choice(['huggingface', 'gemini']), help='LLM provider to use')
 @click.option('--config', '-c', default='config/generation_config.yaml', help='Path to config file')
 def run(num_reviews, provider, config):
     """Generate reviews and analyze quality (full pipeline)."""
@@ -106,7 +107,8 @@ def run(num_reviews, provider, config):
     if num_reviews is None:
         num_reviews = cfg.get('num_reviews', 100)
     if provider is None:
-        provider = os.getenv('DEFAULT_PROVIDER', 'openai')
+        provider = os.getenv('DEFAULT_PROVIDER', 'huggingface')
+
     
     try:
         # Step 1: Generate

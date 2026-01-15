@@ -20,10 +20,12 @@ def main():
     print("\n[1/3] Generating synthetic reviews...")
     reviews = generate_reviews(
         num_reviews=20,  # Small number for quick demo
-        provider='openai',
+        provider='gemini',  # Using Gemini (faster than Hugging Face for demo)
         config_path='config/generation_config.yaml',
+        real_reviews_path='data/real_reviews.jsonl',
         output_path='data/generated_reviews.jsonl'
     )
+
     
     # Step 2: Show statistics
     print("\n[2/3] Displaying statistics...")
@@ -33,7 +35,7 @@ def main():
     print("\n[3/3] Analyzing quality...")
     report = compare_reviews(
         synthetic_path='data/generated_reviews.jsonl',
-        real_path='data/real_reviews.csv',
+        real_path='data/real_reviews.jsonl',
         config_path='config/generation_config.yaml',
         output_path='quality_report.json'
     )

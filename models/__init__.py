@@ -1,7 +1,6 @@
-"""Models package for synthetic review generation."""
+"""
+Models package for review generation.
+"""
+from models.azure_openai_generator import AzureOpenAIGenerator
 
-from models.base_generator import BaseGenerator
-from models.openai_generator import OpenAIGenerator
-from models.anthropic_generator import AnthropicGenerator
-
-__all__ = ['BaseGenerator', 'OpenAIGenerator', 'AnthropicGenerator']
+__all__ = ['AzureOpenAIGenerator']

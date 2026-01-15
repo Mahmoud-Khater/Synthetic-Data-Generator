@@ -1,32 +1,37 @@
 """
 Comparison script for real vs synthetic reviews.
 """
-import pandas as pd
+import json
 from typing import List, Dict
 from generate import load_config, load_real_reviews, load_generated_reviews
 from quality import QualityReporter
 
 
-def load_real_reviews_with_ratings(csv_path: str = 'data/real_reviews.csv') -> List[Dict]:
+def load_real_reviews_with_ratings(jsonl_path: str = 'data/real_reviews.jsonl') -> List[Dict]:
     """
-    Load real reviews with ratings from CSV.
+    Load real reviews with ratings from JSONL.
     
     Args:
-        csv_path: Path to real reviews CSV
+        jsonl_path: Path to real reviews JSONL
         
     Returns:
         List of review dictionaries
     """
-    df = pd.read_csv(csv_path)
-    return [
-        {'rating': row['rating'], 'text': row['review_text']}
-        for _, row in df.iterrows()
-    ]
+    reviews = []
+    with open(jsonl_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            review_obj = json.loads(line)
+            # Extract rating and text, supporting multiple field names
+            rating = review_obj.get('rating') or review_obj.get('overall', 0)
+            text = review_obj.get('text') or review_obj.get('review_text') or review_obj.get('reviewText', '')
+            if text and rating:
+                reviews.append({'rating': int(rating), 'text': text})
+    return reviews
 
 
 def compare_reviews(
     synthetic_path: str = 'data/generated_reviews.jsonl',
-    real_path: str = 'data/real_reviews.csv',
+    real_path: str = 'data/real_reviews.jsonl',
     config_path: str = 'config/generation_config.yaml',
     output_path: str = 'quality_report.json'
 ):
@@ -35,7 +40,7 @@ def compare_reviews(
     
     Args:
         synthetic_path: Path to generated reviews JSONL
-        real_path: Path to real reviews CSV
+        real_path: Path to real reviews JSONL
         config_path: Path to configuration file
         output_path: Path to save quality report
     """

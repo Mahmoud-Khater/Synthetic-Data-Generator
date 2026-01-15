@@ -4,11 +4,14 @@ Main generation script for synthetic reviews.
 import os
 import json
 import yaml
-import pandas as pd
 from typing import List, Dict
 from tqdm import tqdm
 from dotenv import load_dotenv
-from models import OpenAIGenerator, AnthropicGenerator
+from models.azure_openai_generator import AzureOpenAIGenerator
+
+
+
+
 
 
 def load_config(config_path: str = 'config/generation_config.yaml') -> Dict:
@@ -17,10 +20,19 @@ def load_config(config_path: str = 'config/generation_config.yaml') -> Dict:
         return yaml.safe_load(f)
 
 
-def load_real_reviews(csv_path: str = 'data/real_reviews.csv') -> List[str]:
-    """Load real reviews from CSV file."""
-    df = pd.read_csv(csv_path)
-    return df['review_text'].tolist()
+def load_real_reviews(jsonl_path: str = 'data/real_reviews.jsonl') -> List[str]:
+    """Load real reviews from JSONL file."""
+    reviews = []
+    with open(jsonl_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            review_obj = json.loads(line)
+            # Extract review text from the JSON object
+            # Support both 'text' and 'review_text' fields
+            review_text = review_obj.get('text') or review_obj.get('review_text') or review_obj.get('reviewText', '')
+            if review_text:
+                reviews.append(review_text)
+    return reviews
+
 
 
 def create_generator(provider: str, config: Dict):
@@ -28,25 +40,24 @@ def create_generator(provider: str, config: Dict):
     Create a generator instance based on provider.
     
     Args:
-        provider: Provider name ('openai' or 'anthropic')
+        provider: Provider name (only 'azure' supported)
         config: Configuration dictionary
         
     Returns:
         Generator instance
     """
-    if provider.lower() == 'openai':
-        return OpenAIGenerator(config)
-    elif provider.lower() == 'anthropic':
-        return AnthropicGenerator(config)
+    if provider.lower() in ['azure', 'azure_openai']:
+        return AzureOpenAIGenerator(config)
     else:
-        raise ValueError(f"Unknown provider: {provider}")
+        raise ValueError(f"Unknown provider: {provider}. Only 'azure' is supported.")
+
 
 
 def generate_reviews(
     num_reviews: int,
-    provider: str = 'openai',
+    provider: str = 'azure',
     config_path: str = 'config/generation_config.yaml',
-    real_reviews_path: str = 'data/real_reviews.csv',
+    real_reviews_path: str = 'data/real_reviews.jsonl',
     output_path: str = 'data/generated_reviews.jsonl'
 ) -> List[Dict]:
     """
@@ -56,7 +67,7 @@ def generate_reviews(
         num_reviews: Number of reviews to generate
         provider: LLM provider to use
         config_path: Path to configuration file
-        real_reviews_path: Path to real reviews CSV
+        real_reviews_path: Path to real reviews JSONL
         output_path: Path to save generated reviews
         
     Returns:
@@ -134,7 +145,7 @@ if __name__ == '__main__':
     load_dotenv()
     
     # Get provider from environment or use default
-    provider = os.getenv('DEFAULT_PROVIDER', 'openai')
+    provider = os.getenv('DEFAULT_PROVIDER', 'azure')
     
     # Load config to get num_reviews
     config = load_config()
