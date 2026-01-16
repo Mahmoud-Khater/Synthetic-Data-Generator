@@ -2,6 +2,8 @@ from langgraph.graph import StateGraph, END
 from typing import TypedDict, Optional, Dict, List
 from models.azure_openai_generator import AzureOpenAIGenerator
 from models.azure_openai_reviewer import AzureOpenAIReviewer
+from models.mistral_fashion_generator import MistralFashionGenerator
+from models.gemma_fashion_generator import GemmaFashionGenerator
 from quality.duplicate_detector import DuplicateDetector
 from quality.stratified_sampler import stratified_sample, load_real_reviews
 from quality.domain_validator import validate_reviews_batch
@@ -41,40 +43,82 @@ def load_config(config_path: str = "config/generation_config.yaml") -> Dict:
 # Load configuration
 config = load_config()
 
-# Initialize Azure OpenAI Generator & Reviewer
-generator = AzureOpenAIGenerator(config=config)
+# Initialize Generators & Reviewer
+# generator = AzureOpenAIGenerator(config=config) # Default
+mistral_generator = MistralFashionGenerator(config=config)
+gemma_generator = GemmaFashionGenerator(config=config)
+
 reviewer = AzureOpenAIReviewer(config=config)
 quality_reporter = QualityReporter(config=config)
 
 
 # ----- 3. Node: Generate Review -----
 def generate_review_node(state: ReviewState) -> ReviewState:
-    """Generate a review using Azure OpenAI."""
-    print(f"\n🔄 Attempt {state['attempt'] + 1}/{state['max_attempts']}: Generating review...")
+    """Generate a review using the appropriate model based on attempt number."""
+    attempt_idx = state['attempt']
+    max_attempts = state['max_attempts']
     
-    # Load real reviews for context if this is a retry (attempt > 0)
+    print(f"\n🔄 Attempt {attempt_idx + 1}/{max_attempts}: ", end="")
+    
     real_reviews = []
-    if state["attempt"] > 0:
-        try:
-            real_reviews_path = "data/real_reviews.jsonl"
-            
-            # Read all reviews from JSONL file
-            all_reviews = []
-            with open(real_reviews_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    review_data = json.loads(line.strip())
-                    all_reviews.append(review_data['text'])
-            
-            # Select 3 random reviews
-            if len(all_reviews) >= 3:
-                real_reviews = random.sample(all_reviews, 3)
-                print(f"📚 Loaded 3 real review examples for context")
-            
-        except Exception as e:
-            print(f"⚠️  Could not load real reviews: {str(e)}")
-            real_reviews = []
     
-    review = generator.generate_review(
+    # Strategy Logic
+    if attempt_idx == 0:
+        # Attempt 1: Gemma - No examples
+        mistral_generator.unload() # Ensure Mistral is unloaded
+        current_generator = gemma_generator
+        print("Using Gemma Fashion (No Context)")
+        
+    elif attempt_idx == 1:
+        # Attempt 2: Gemma - With examples
+        mistral_generator.unload() # Ensure Mistral is unloaded
+        current_generator = gemma_generator
+        # Load examples
+        try:
+             real_reviews_path = "data/real_reviews.jsonl"
+             all_reviews = []
+             with open(real_reviews_path, 'r', encoding='utf-8') as f:
+                 for line in f:
+                     review_data = json.loads(line.strip())
+                     all_reviews.append(review_data['text'])
+             if len(all_reviews) >= 3:
+                 real_reviews = random.sample(all_reviews, 3)
+        except Exception:
+             real_reviews = []
+        print("Using Gemma Fashion (With Context)")
+        
+    elif attempt_idx == 2:
+        # Attempt 3: Mistral - No examples
+        gemma_generator.unload() # Unload Gemma to free memory
+        current_generator = mistral_generator
+        print("Using Mistral Fashion (No Context)")
+        
+    elif attempt_idx >= 3:
+        # Attempt 4+: Mistral - With examples
+        gemma_generator.unload() # Ensure Gemma is unloaded
+        current_generator = mistral_generator
+        # Load examples
+        try:
+             real_reviews_path = "data/real_reviews.jsonl"
+             all_reviews = []
+             with open(real_reviews_path, 'r', encoding='utf-8') as f:
+                 for line in f:
+                     review_data = json.loads(line.strip())
+                     all_reviews.append(review_data['text'])
+             if len(all_reviews) >= 3:
+                 real_reviews = random.sample(all_reviews, 3)
+        except Exception:
+             real_reviews = []
+        print("Using Mistral Fashion (With Context)")
+    
+    else:
+        # Fallback
+        gemma_generator.unload()
+        current_generator = mistral_generator
+        print("Using Mistral Fashion (Fallback)")
+
+
+    review = current_generator.generate_review(
         rating=state["rating"],
         persona=state["persona"],
         real_reviews=real_reviews
@@ -204,7 +248,7 @@ graph = builder.compile()
 
 
 # ----- 7. Helper Functions -----
-def run_review_generation(persona: Dict, rating: int, max_attempts: int = 3) -> Dict:
+def run_review_generation(persona: Dict, rating: int, max_attempts: int = 4) -> Dict:
     """
     Run the review generation workflow for a single review.
     
@@ -241,7 +285,7 @@ def run_review_generation(persona: Dict, rating: int, max_attempts: int = 3) -> 
     return final_state
 
 
-def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_attempts: int = 3) -> List[Dict]:
+def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_attempts: int = 4) -> List[Dict]:
     """
     Generate multiple reviews and return them with metadata.
     
@@ -279,7 +323,7 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
             "text": result["review"],
             "rating": result["rating"],
             "persona": result["persona"],
-            "provider": generator.get_provider_name(),
+            "provider": "local_ensemble",
             "attempts": result["attempt"],
             "quality_assessment": result["quality_assessment"],
             "generated_at": datetime.now().isoformat()
@@ -321,7 +365,7 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
                     "text": result["review"],
                     "rating": result["rating"],
                     "persona": result["persona"],
-                    "provider": generator.get_provider_name(),
+                    "provider": "local_ensemble",
                     "attempts": result["attempt"],
                     "quality_assessment": result["quality_assessment"],
                     "generated_at": datetime.now().isoformat()
@@ -421,6 +465,10 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     
     print(f"📊 Initial Quality Score: {best_score:.1f}/100")
     
+    # Get configuration for refinement
+    personas = config.get('personas')
+    rating_distribution = config.get('rating_distribution')
+
     for attempt in range(1, 4):  # 3 refinement attempts
         print(f"\n🔄 Refinement Attempt {attempt}/3:")
         
@@ -433,7 +481,7 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
         refined_reviews, refine_stats, removed_count = refiner.refine_reviews(
             reviews=best_reviews,
             quality_report=best_report,
-            generator=generator,
+            generator=mistral_generator,
             reviewer=reviewer,
             personas=personas,
             rating_distribution=rating_distribution,

@@ -40,3 +40,6 @@ quality_reports/
 
 # Logs
 *.log
+
+# hugging face models
+/domain_models
