@@ -1,0 +1,162 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-16T23:07:32.792097",
+    "num_synthetic_reviews": 100,
+    "num_real_reviews": 98,
+    "provider": "azure_openai_gpt-4.1-mini"
+  },
+  "quality_score": {
+    "overall": 68.37,
+    "breakdown": {
+      "diversity": 23.73,
+      "bias": 100,
+      "realism": 75
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.1539,
+      "unique_tokens": 1634,
+      "total_tokens": 10620,
+      "avg_unique_per_review": 88.34,
+      "top_10_token_ratio": 0.194
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.6793,
+      "max_similarity": 0.8595,
+      "min_similarity": 0.475,
+      "std_similarity": 0.0947
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0831,
+      "std_tfidf_similarity": 0.054
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0
+      },
+      "total_deviation": 0.0,
+      "is_biased": false
+    },
+    "sentiment_consistency": {
+      "total_reviews": 100,
+      "inconsistencies_found": 1,
+      "inconsistency_rate": 0.01,
+      "is_consistent": true,
+      "examples": [
+        {
+          "rating": 1,
+          "issue": "Low rating but positive sentiment",
+          "pos_words": 2,
+          "neg_words": 1
+        }
+      ]
+    },
+    "repetitive_patterns": {
+      "total_reviews": 100,
+      "unique_reviews": 100,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [],
+      "has_repetition_issues": false
+    },
+    "length_distribution": {
+      "avg_length": 106.18,
+      "std_length": 13.6,
+      "min_length": 53,
+      "max_length": 131,
+      "is_too_uniform": false
+    },
+    "overall_bias_detected": false
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 85,
+        "fit": 11,
+        "quality": 42,
+        "style": 12,
+        "durability": 56,
+        "price": 4,
+        "sizing": 74
+      },
+      "reviews_with_aspects": 94,
+      "total_reviews": 100,
+      "coverage_rate": 0.94,
+      "avg_mentions_per_aspect": 40.57,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 46.66,
+      "min_score": 13.53,
+      "max_score": 80.51,
+      "interpretation": "Difficult",
+      "is_natural": false
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 100,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 96,
+      "total_reviews": 100,
+      "pronoun_usage_rate": 0.96,
+      "is_natural": true
+    },
+    "overall_realistic": false
+  },
+  "comparison_with_real": {
+    "vocabulary": {
+      "synthetic_ttr": 0.1539,
+      "real_ttr": 0.2633,
+      "ttr_difference": 0.1094
+    },
+    "length": {
+      "synthetic_avg": 106.18,
+      "real_avg": 29.07,
+      "length_difference": 77.11
+    },
+    "similarity_to_real": {
+      "avg_max_similarity": 0.6713,
+      "min_similarity": 0.5005,
+      "max_similarity": 0.7761,
+      "interpretation": "High similarity (>0.7) may indicate copying; very low (<0.3) may indicate unrealistic content"
+    }
+  },
+  "recommendations": [
+    "Limited vocabulary diversity. Encourage more varied word choices in prompts.",
+    "Readability scores outside natural range. Adjust language complexity in prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 100,
+    "shoe_related_count": 100,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.8834863872996802,
+    "avg_keyword_count": 10.76,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}

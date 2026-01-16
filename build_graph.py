@@ -299,7 +299,6 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
     """
     
     # Load rating distribution from config
-    config = load_config()
     rating_distribution = config.get('rating_distribution')
     
     # Initialize fixed sampler for deterministic rating distribution
@@ -455,6 +454,9 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     print(f"Quality Refinement Loop")
     print(f"{'='*60}\n")
     
+    # Load config for refinement
+    personas = config.get('personas')
+    rating_distribution = config.get('rating_distribution')
     
     refiner = QualityRefiner()
     best_reviews = reviews

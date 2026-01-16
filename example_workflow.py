@@ -8,53 +8,9 @@ This script shows how to:
 from build_graph import (
     run_review_generation,
     generate_batch_reviews,
-    generate_quality_report
+    generate_quality_report,
+    load_config
 )
-
-
-# Example personas
-EXAMPLE_PERSONAS = [
-    {
-        "name": "Tech Enthusiast",
-        "description": "A 25-35 year old tech-savvy professional who values innovation and features",
-        "traits": [
-            "Detailed and analytical",
-            "Enthusiastic about new technology",
-            "Focuses on technical specifications",
-            "Writes comprehensive reviews"
-        ]
-    },
-    {
-        "name": "Budget Shopper",
-        "description": "A 30-45 year old price-conscious family person who focuses on value for money",
-        "traits": [
-            "Practical and straightforward",
-            "Compares prices carefully",
-            "Values durability",
-            "Writes brief, to-the-point reviews"
-        ]
-    },
-    {
-        "name": "Quality Seeker",
-        "description": "A 40-60 year old affluent professional who prioritizes quality over price",
-        "traits": [
-            "Sophisticated and critical",
-            "Expects premium quality",
-            "Detailed in observations",
-            "High standards for products"
-        ]
-    },
-    {
-        "name": "Casual User",
-        "description": "An 18-30 year old casual consumer who values ease of use and good enough quality",
-        "traits": [
-            "Informal writing style",
-            "Brief and concise",
-            "Focuses on user experience",
-            "Uses casual language"
-        ]
-    }
-]
 
 
 def example_single_review():
@@ -63,8 +19,12 @@ def example_single_review():
     print("EXAMPLE 1: Single Review Generation")
     print("="*80)
     
-    persona = EXAMPLE_PERSONAS[0]
-    rating = 5
+    # Load personas from config
+    config = load_config()
+    personas = config.get('personas', [])
+    
+    persona = personas[0]  # Use first persona
+    rating = 4  # 0-4 scale
     
     result = run_review_generation(
         persona=persona,
@@ -85,11 +45,17 @@ def example_batch_generation():
     print("EXAMPLE 2: Batch Review Generation with Quality Report")
     print("="*80)
     
-    # Generate 100 reviews
+    # Load personas from config
+    config = load_config()
+    personas = config.get('personas', [])
+    
+    print(f"📋 Loaded {len(personas)} personas from config")
+    
+    # Generate reviews
     reviews = generate_batch_reviews(
-        personas=EXAMPLE_PERSONAS,
-        num_reviews=10,
-        max_attempts=4
+        personas=personas,
+        num_reviews=30,
+        max_attempts=3
     )
     
     print(f"\n✅ Generated {len(reviews)} reviews")
