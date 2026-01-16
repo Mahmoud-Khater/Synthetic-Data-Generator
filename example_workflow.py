@@ -88,7 +88,7 @@ def example_batch_generation():
     # Generate 100 reviews
     reviews = generate_batch_reviews(
         personas=EXAMPLE_PERSONAS,
-        num_reviews=100,
+        num_reviews=10,
         max_attempts=3
     )
     

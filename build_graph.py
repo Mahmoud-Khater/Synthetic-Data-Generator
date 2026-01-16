@@ -419,6 +419,10 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     
     print(f"📊 Initial Quality Score: {best_score:.1f}/100")
     
+    # Get configuration for refinement
+    personas = config.get('personas')
+    rating_distribution = config.get('rating_distribution')
+
     for attempt in range(1, 4):  # 3 refinement attempts
         print(f"\n🔄 Refinement Attempt {attempt}/3:")
         
@@ -435,7 +439,7 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
             reviewer=reviewer,
             personas=personas,
             rating_distribution=rating_distribution,
-            real_reviews=real_reviews,
+            real_reviews=sampled_real_reviews,
             max_attempts=3
         )
         
