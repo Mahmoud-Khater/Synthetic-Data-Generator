@@ -48,7 +48,7 @@ class AzureOpenAIReviewer:
         
         Args:
             review_text: The generated review text to evaluate
-            rating: The rating (1-5) associated with the review
+            rating: The rating (0-4) associated with the review
             persona: The persona dictionary used to generate the review
             
         Returns:
@@ -68,11 +68,41 @@ Review the following generated review and assess its quality:
 - Writing Style: {persona.get('writing_style', 'N/A')}
 
 **Evaluation Criteria:**
-1. **Authenticity**: Does the review sound natural and human-written?
-2. **Consistency**: Does the review content match the rating ({rating}/5)?
-3. **Persona Alignment**: Does the review reflect the persona's characteristics?
-4. **Quality**: Is the review well-written, coherent, and free of obvious errors?
-5. **Realism**: Could this review plausibly appear on a real review platform?
+1. **Authenticity**: Does the review sound genuinely human-written with natural imperfections? Should feel personal and unique, not templated.
+2. **Consistency**: Does the review content STRONGLY match the rating ({rating}/4)? Content must clearly justify the rating with specific examples.
+3. **Persona Alignment**: Does the review clearly reflect the persona's perspective and traits? Generic reviews score lower.
+4. **Quality**: Is the review detailed, well-structured, and includes MULTIPLE specific examples? Vague or generic statements score poorly.
+5. **Realism**: Does this feel like a real person sharing their genuine experience? Should mention specific use cases and personal context.
+
+**Strict Scoring Guidelines:**
+- Reviews MUST include at least 3-4 specific product details (fit, comfort, materials, style, durability, price, etc.)
+- Reviews should include personal context or use case (e.g., "wore them to work", "used for running", "bought for my son")
+- Generic statements like "good quality" or "comfortable" without specifics score LOW (5-6/10)
+- Reviews should have natural variation - not all reviews should follow the same structure
+- Rating alignment is CRITICAL: 4-star must be enthusiastic, 0-star must express clear disappointment
+- Overly polished or marketing-like language scores lower (7/10 max)
+- Reviews lacking specific examples or personal experience score 6-7/10
+- If persona details are N/A or minimal, give neutral scores (7-8) for persona alignment only
+- Score each criterion from 1-10
+- Calculate overall_score as the average of all criteria scores
+- Set "pass" to true if overall_score is 7.5 or higher
+- Set "pass" to false if overall_score is below 7.5
+
+**What makes an EXCELLENT review (8+):**
+- Mentions 3+ specific product features with details
+- Includes personal story, use case, or context
+- Has natural language with some imperfections (not overly polished)
+- Strongly matches the rating with clear justification
+- Feels unique and genuine, not generic or templated
+- Shows the persona's perspective clearly
+
+**What makes a POOR review (below 7.5):**
+- Generic statements without specifics ("nice shoes", "good quality")
+- No personal context or use case mentioned
+- Doesn't clearly justify the rating
+- Feels templated or too similar to other reviews
+- Lacks detail or specific examples
+- Too short or incomplete
 
 **Provide your assessment in the following JSON format:**
 {{
@@ -82,7 +112,7 @@ Review the following generated review and assess its quality:
     "quality_score": <1-10>,
     "realism_score": <1-10>,
     "overall_score": <1-10>,
-    "pass": <true/false>,
+    "pass": <true if overall_score >= 7.5, false otherwise>,
     "issues": ["list of any issues found"],
     "suggestions": ["list of improvement suggestions"]
 }}
@@ -97,7 +127,7 @@ Provide only the JSON output, no additional text."""
         
         Args:
             review_text: The generated review text to evaluate
-            rating: The rating (1-5) associated with the review
+            rating: The rating (0-4) associated with the review
             persona: The persona dictionary used to generate the review
             
         Returns:

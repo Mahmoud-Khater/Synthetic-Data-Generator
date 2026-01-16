@@ -85,10 +85,10 @@ def example_batch_generation():
     print("EXAMPLE 2: Batch Review Generation with Quality Report")
     print("="*80)
     
-    # Generate 10 reviews
+    # Generate 100 reviews
     reviews = generate_batch_reviews(
         personas=EXAMPLE_PERSONAS,
-        num_reviews=10,
+        num_reviews=100,
         max_attempts=3
     )
     
@@ -106,7 +106,7 @@ def example_batch_generation():
     # Generate quality report
     report = generate_quality_report(
         reviews=reviews,
-        output_path="data/quality_report.json"
+        output_dir="reports"
     )
     
     return reviews, report
@@ -147,7 +147,7 @@ def example_custom_workflow():
     # Generate report
     report = generate_quality_report(
         reviews=reviews,
-        output_path="data/custom_quality_report.json"
+        output_dir="reports"
     )
     
     return reviews, report

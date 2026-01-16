@@ -5,11 +5,11 @@ num_reviews: 10
 
 # Rating distribution (should sum to 1.0)
 rating_distribution:
-  1: 0.05  # 5% - Very negative
-  2: 0.10  # 10% - Negative
-  3: 0.20  # 20% - Neutral
-  4: 0.35  # 35% - Positive
-  5: 0.30  # 30% - Very positive
+  0: 0.10  # 10% - Very negative
+  1: 0.15  # 15% - Negative
+  2: 0.30  # 30% - Neutral
+  3: 0.25  # 25% - Positive
+  4: 0.20  # 20% - Very positive
 
 # Reviewer personas
 personas:
@@ -55,8 +55,14 @@ review_length:
 
 # Temperature settings for generation
 generation_params:
-  temperature: 0.8
-  max_tokens: 1000
+  temperature: 1.1  # Maximum diversity - reduced repetition
+  max_tokens: 250   # Increased for variable length
+  top_p: 0.9
+
+# Review parameters (for quality assessment)
+review_params:
+  temperature: 0.3  # Lower temperature for consistent evaluations
+  max_tokens: 500
   top_p: 0.9
 
 # Product context (can be customized)

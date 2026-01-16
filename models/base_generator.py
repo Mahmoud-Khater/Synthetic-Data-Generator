@@ -30,7 +30,7 @@ class BaseGenerator(ABC):
         Generate a single synthetic review.
         
         Args:
-            rating: The rating (1-5) for this review
+            rating: The rating (0-4) for this review
             persona: The persona dictionary to use for generation
             real_reviews: List of real reviews for context/style matching
             
@@ -64,7 +64,7 @@ class BaseGenerator(ABC):
         Build the prompt for LLM generation.
         
         Args:
-            rating: The rating (1-5) for this review
+            rating: The rating (0-4) for this review
             persona: The persona dictionary to use
             real_reviews: Sample real reviews for style reference
             
@@ -73,26 +73,63 @@ class BaseGenerator(ABC):
         """
         # Sample a few real reviews for context
         sample_reviews = random.sample(real_reviews, min(5, len(real_reviews)))
+        examples_block = ""
+        if sample_reviews:
+            joined_examples = "\n".join(f'- "{r}"' for r in sample_reviews)
+            examples_block = f"""
+        Here are some example reviews for style reference:
+        {joined_examples}
+        """
         
+        # Randomly select ONE trait from the persona's traits for more variety
+        selected_trait = random.choice(persona['traits']) if persona.get('traits') else "casual reviewer"
+
+        # Rating-specific tone guidance
+        rating_guidance = {
+            0: "Express clear disappointment and frustration. Use negative language.",
+            1: "Show dissatisfaction. Mention specific problems and issues.",
+            2: "Be balanced - mention both pros and cons. Use neutral, mixed language.",
+            3: "Show satisfaction. Be positive but mention minor areas for improvement.",
+            4: "Express enthusiasm and strong satisfaction. Use very positive language."
+        }
+        tone_instruction = rating_guidance.get(rating, "Match your tone to the rating.")
+
         prompt = f"""You are writing a product review for {self.product_context.get('category', 'a product')}.
 
             Persona: {persona['name']}
             Description: {persona['description']}
-            Traits:
-            {chr(10).join(f"- {trait}" for trait in persona['traits'])}
+            Key Trait: {selected_trait}
 
-            Rating: {rating}/5 stars
+            Rating: {rating}/4 stars
 
-            Here are some example reviews for style reference:
-            {chr(10).join(f'- "{review}"' for review in sample_reviews)}
+            {examples_block}
 
-            Write a realistic review from this persona's perspective with a {rating}/5 rating.
+            Write a realistic review from this persona's perspective with a {rating}/4 rating.
+            
+            CRITICAL - Phrase Blacklist (DO NOT USE):
+            - "the fit was" / "the fit is"
+            - "for the price" / "for the price point"
+            - "i expected" / "i was hoping"
+            - "after just a" / "after a few"
+            - "true to size"
+            - "the style is" / "the style was"
+            
+            CRITICAL - Variety Requirements:
+            - Start your review in a UNIQUE way (not "the", "for", "i was")
+            - Use varied sentence structures throughout
+            - Be creative with phrasing - avoid clichés
+            - Make this review feel completely different from others
+            
+            Rating Alignment:
+            - {tone_instruction}
+            - Your language and sentiment MUST match the {rating}/4 rating
+            
             The review should:
             - Be between {self.review_length.get('min_words', 20)} and {self.review_length.get('max_words', 150)} words
-            - Match the persona's characteristics and perspective
+            - Reflect the key trait mentioned above
             - Feel authentic and natural
             - Mention relevant aspects like: {', '.join(self.product_context.get('aspects', []))}
-            - Match the rating appropriately (higher ratings = more positive)
+            - Include specific personal context or use case
 
             Write ONLY the review text, no additional commentary or labels."""
 

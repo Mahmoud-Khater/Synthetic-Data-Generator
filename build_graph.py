@@ -2,11 +2,18 @@ from langgraph.graph import StateGraph, END
 from typing import TypedDict, Optional, Dict, List
 from models.azure_openai_generator import AzureOpenAIGenerator
 from models.azure_openai_reviewer import AzureOpenAIReviewer
+from quality.duplicate_detector import DuplicateDetector
+from quality.stratified_sampler import stratified_sample, load_real_reviews
+from quality.domain_validator import validate_reviews_batch
 from quality.quality_report import QualityReporter
+from quality.quality_refiner import QualityRefiner
 import json
+import yaml
+import random
+import os
 from datetime import datetime
 from dotenv import load_dotenv
-
+from utils.fixed_sampler import FixedSampler
 # Load environment variables from .env file
 load_dotenv()
 
@@ -20,33 +27,21 @@ class ReviewState(TypedDict):
     attempt: int
     max_attempts: int
     all_reviews: List[Dict]  # Track all generated reviews for reporting
+    attempt_history: List[Dict]  # Track all attempts with their scores
 
 
-# ----- 2. Load Azure OpenAI Generator & Reviewer -----
-config = {
-    "generation_params": {
-        "max_tokens": 200,
-        "temperature": 0.8,
-        "top_p": 0.9
-    },
-    "review_params": {
-        "max_tokens": 1000,
-        "temperature": 0.3,
-        "top_p": 0.9
-    },
-    "product_context": {
-        "category": "product",
-        "aspects": ["quality", "price", "service", "experience"]
-    },
-    "rating_distribution": {
-        1: 0.05,
-        2: 0.10,
-        3: 0.20,
-        4: 0.35,
-        5: 0.30
-    }
-}
+# ----- 2. Load Configuration from YAML -----
 
+def load_config(config_path: str = "config/generation_config.yaml") -> Dict:
+    """Load configuration from YAML file."""
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    return config
+
+# Load configuration
+config = load_config()
+
+# Initialize Azure OpenAI Generator & Reviewer
 generator = AzureOpenAIGenerator(config=config)
 reviewer = AzureOpenAIReviewer(config=config)
 quality_reporter = QualityReporter(config=config)
@@ -57,10 +52,32 @@ def generate_review_node(state: ReviewState) -> ReviewState:
     """Generate a review using Azure OpenAI."""
     print(f"\n🔄 Attempt {state['attempt'] + 1}/{state['max_attempts']}: Generating review...")
     
+    # Load real reviews for context if this is a retry (attempt > 0)
+    real_reviews = []
+    if state["attempt"] > 0:
+        try:
+            real_reviews_path = "data/real_reviews.jsonl"
+            
+            # Read all reviews from JSONL file
+            all_reviews = []
+            with open(real_reviews_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    review_data = json.loads(line.strip())
+                    all_reviews.append(review_data['text'])
+            
+            # Select 3 random reviews
+            if len(all_reviews) >= 3:
+                real_reviews = random.sample(all_reviews, 3)
+                print(f"📚 Loaded 3 real review examples for context")
+            
+        except Exception as e:
+            print(f"⚠️  Could not load real reviews: {str(e)}")
+            real_reviews = []
+    
     review = generator.generate_review(
         rating=state["rating"],
         persona=state["persona"],
-        real_reviews=[]  # Can pass real reviews for context if available
+        real_reviews=real_reviews
     )
     
     print(f"✅ Generated review: {review[:100]}...")
@@ -91,18 +108,43 @@ def guardrail_check_node(state: ReviewState) -> ReviewState:
         if assessment.get('issues'):
             print(f"   - Issues: {', '.join(assessment['issues'][:3])}")
         
-        return {**state, "quality_assessment": assessment}
+        # Save this attempt to history
+        attempt_history = state.get("attempt_history", [])
+        attempt_history.append({
+            "attempt_number": state["attempt"],
+            "review": state["review"],
+            "quality_assessment": assessment,
+            "overall_score": assessment.get("overall_score", 0)
+        })
+        
+        return {
+            **state,
+            "quality_assessment": assessment,
+            "attempt_history": attempt_history
+        }
         
     except Exception as e:
         print(f"⚠️  Error during review: {str(e)}")
         # If review fails, mark as failed assessment
+        failed_assessment = {
+            "pass": False,
+            "overall_score": 0,
+            "issues": [f"Review error: {str(e)}"]
+        }
+        
+        # Save this failed attempt to history
+        attempt_history = state.get("attempt_history", [])
+        attempt_history.append({
+            "attempt_number": state["attempt"],
+            "review": state["review"],
+            "quality_assessment": failed_assessment,
+            "overall_score": 0
+        })
+        
         return {
             **state,
-            "quality_assessment": {
-                "pass": False,
-                "overall_score": 0,
-                "issues": [f"Review error: {str(e)}"]
-            }
+            "quality_assessment": failed_assessment,
+            "attempt_history": attempt_history
         }
 
 
@@ -116,7 +158,22 @@ def check_quality_transition(state: ReviewState) -> str:
         print("✅ Review passed quality check!")
         return "good"
     elif state["attempt"] >= state["max_attempts"]:
-        print(f"⚠️  Max attempts ({state['max_attempts']}) reached. Accepting review.")
+        print(f"⚠️  Max attempts ({state['max_attempts']}) reached.")
+        
+        # Select the best review from all attempts
+        attempt_history = state.get("attempt_history", [])
+        if attempt_history:
+            # Find the attempt with the highest score
+            best_attempt = max(attempt_history, key=lambda x: x["overall_score"])
+            best_score = best_attempt["overall_score"]
+            best_attempt_num = best_attempt["attempt_number"]
+            
+            print(f"📊 Selecting best review from attempt {best_attempt_num} (score: {best_score}/10)")
+            
+            # Update state with the best review
+            state["review"] = best_attempt["review"]
+            state["quality_assessment"] = best_attempt["quality_assessment"]
+        
         return "give_up"
     else:
         print(f"🔄 Quality check failed. Retrying...")
@@ -153,7 +210,7 @@ def run_review_generation(persona: Dict, rating: int, max_attempts: int = 3) -> 
     
     Args:
         persona: Persona dictionary
-        rating: Rating (1-5)
+        rating: Rating (0-4)
         max_attempts: Maximum regeneration attempts
         
     Returns:
@@ -166,11 +223,12 @@ def run_review_generation(persona: Dict, rating: int, max_attempts: int = 3) -> 
         "quality_assessment": None,
         "attempt": 0,
         "max_attempts": max_attempts,
-        "all_reviews": []
+        "all_reviews": [],
+        "attempt_history": []
     }
     
     print(f"\n{'='*60}")
-    print(f"Starting review generation for {persona.get('name', 'Unknown')} - Rating: {rating}/5")
+    print(f"Starting review generation for {persona.get('name', 'Unknown')} - Rating: {rating}/4")
     print(f"{'='*60}")
     
     final_state = graph.invoke(initial_state)
@@ -195,14 +253,20 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
     Returns:
         List of review dictionaries with metadata
     """
-    import random
+    
+    # Load rating distribution from config
+    config = load_config()
+    rating_distribution = config.get('rating_distribution')
+    
+    # Initialize fixed sampler for deterministic rating distribution
+    fixed_sampler = FixedSampler()
     
     reviews = []
     
     for i in range(num_reviews):
-        # Select random persona and rating
+        # Select random persona but use fixed sampling for rating
         persona = random.choice(personas)
-        rating = generator.select_rating()
+        rating = fixed_sampler.get_next_rating(rating_distribution, num_reviews)
         
         print(f"\n{'#'*60}")
         print(f"Review {i+1}/{num_reviews}")
@@ -224,16 +288,67 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
         
         reviews.append(review_data)
     
+    print(f"\n{'='*60}")
+    print(f"Checking for Semantic Duplicates")
+    print(f"{'='*60}\n")
+    
+    # Detect and remove duplicates using FAISS
+    
+    detector = DuplicateDetector(similarity_threshold=0.95)
+    unique_reviews, dup_stats = detector.remove_duplicates(reviews)
+    
+    print(f"📊 Duplicate Detection Results:")
+    print(f"   - Original count: {dup_stats['original_count']}")
+    print(f"   - Duplicates found: {dup_stats['duplicate_count']}")
+    print(f"   - Unique reviews: {dup_stats['unique_count']}")
+    print(f"   - Duplicate rate: {dup_stats['duplicate_rate']*100:.1f}%")
+    
+    # Regenerate reviews if needed to reach target count
+    if len(unique_reviews) < num_reviews:
+        needed = num_reviews - len(unique_reviews)
+        print(f"\n🔄 Regenerating {needed} reviews to reach target count...")
+        
+        iteration = 1
+        while len(unique_reviews) < num_reviews and iteration <= 5:  # Max 5 iterations
+            print(f"\n   Iteration {iteration}: Generating {needed} additional reviews...")
+            
+            for i in range(needed):
+                persona = random.choice(personas)
+                rating = select_rating(rating_distribution)
+                
+                result = run_review_generation(persona, rating, max_attempts)
+                
+                review_data = {
+                    "text": result["review"],
+                    "rating": result["rating"],
+                    "persona": result["persona"],
+                    "provider": generator.get_provider_name(),
+                    "attempts": result["attempt"],
+                    "quality_assessment": result["quality_assessment"],
+                    "generated_at": datetime.now().isoformat()
+                }
+                
+                unique_reviews.append(review_data)
+            
+            # Check for duplicates again
+            unique_reviews, dup_stats = detector.remove_duplicates(unique_reviews)
+            needed = num_reviews - len(unique_reviews)
+            iteration += 1
+        
+        print(f"\n✅ Final count after deduplication: {len(unique_reviews)} reviews")
+    
+    reviews = unique_reviews
+    
     return reviews
 
 
-def generate_quality_report(reviews: List[Dict], output_path: str = "quality_report.json"):
+def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     """
     Generate a comprehensive quality report for the generated reviews.
     
     Args:
         reviews: List of review dictionaries
-        output_path: Path to save the report
+        output_dir: Base directory for reports (default: "reports")
         
     Returns:
         Quality report dictionary
@@ -242,11 +357,136 @@ def generate_quality_report(reviews: List[Dict], output_path: str = "quality_rep
     print("Generating Quality Report")
     print(f"{'='*60}\n")
     
-    report = quality_reporter.generate_report(reviews)
+    # Create timestamped folder
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_dir = f"{output_dir}/report_{timestamp}"
+    os.makedirs(report_dir, exist_ok=True)
     
-    # Save report
-    quality_reporter.save_report(report, output_path)
-    print(f"📄 Report saved to: {output_path}")
+    # Sample real reviews preserving ORIGINAL distribution
+    
+    try:
+        all_real_reviews = load_real_reviews("data/real_reviews.jsonl")
+        sampled_real_reviews = stratified_sample(all_real_reviews, sample_size=len(reviews))
+        print(f"✅ Sampled {len(sampled_real_reviews)} real reviews with original distribution")
+    except Exception as e:
+        print(f"⚠️  Could not load real reviews: {str(e)}")
+        sampled_real_reviews = []
+    
+    # Validate domain (shoe-related content)
+    domain_validation = validate_reviews_batch(reviews)
+    print(f"✅ Domain validation: {domain_validation['shoe_related_percentage']:.1f}% shoe-related")
+    
+    # Generate report with comparisons
+    report = quality_reporter.generate_report(reviews, sampled_real_reviews)
+    
+    # Add domain validation to report
+    report['domain_validation'] = domain_validation
+    
+    # Save generated reviews to the report folder in JSONL format
+    reviews_path = f"{report_dir}/generated_reviews.jsonl"
+    with open(reviews_path, 'w', encoding='utf-8') as f:
+        for review in reviews:
+            # Convert to format matching real reviews: labels, text, persona, model
+            jsonl_entry = {
+                "labels": review.get('rating', 2),  # Rating 0-4
+                "text": review.get('text', ''),
+                "persona": review.get('persona', {}).get('name', 'unknown'),
+                "model": "azure_openai_gpt-4.1-mini"
+            }
+            f.write(json.dumps(jsonl_entry, ensure_ascii=False) + '\n')
+    print(f"💾 Generated reviews saved to: {reviews_path}")
+    
+    # Save reports (both JSON and Markdown)
+    report_path_json = f"{report_dir}/quality_report.json"
+    report_path_md = f"{report_dir}/quality_report.md"
+    
+    quality_reporter.save_report(report, report_path_json)
+    quality_reporter.save_report_markdown(report, report_path_md)
+    
+    print(f"📄 Report saved to: {report_path_md}")
+    print(f"📄 JSON report saved to: {report_path_json}")
+    
+    # Iterative Quality Refinement Loop (3 attempts)
+    print(f"\n{'='*60}")
+    print(f"Quality Refinement Loop")
+    print(f"{'='*60}\n")
+    
+    
+    refiner = QualityRefiner()
+    best_reviews = reviews
+    best_report = report
+    best_score = report['quality_score']['overall']
+    
+    print(f"📊 Initial Quality Score: {best_score:.1f}/100")
+    
+    for attempt in range(1, 4):  # 3 refinement attempts
+        print(f"\n🔄 Refinement Attempt {attempt}/3:")
+        
+        # Check if quality is already good enough
+        if best_score >= 70:
+            print(f"   ✅ Quality score {best_score:.1f}/100 is acceptable. Skipping refinement.")
+            break
+        
+        # Identify and fix problems
+        refined_reviews, refine_stats, removed_count = refiner.refine_reviews(
+            reviews=best_reviews,
+            quality_report=best_report,
+            generator=generator,
+            reviewer=reviewer,
+            personas=personas,
+            rating_distribution=rating_distribution,
+            real_reviews=real_reviews,
+            max_attempts=3
+        )
+        
+        if removed_count == 0:
+            print(f"   ℹ️  No problematic reviews found. Quality is optimal for current settings.")
+            break
+        
+        print(f"   - Removed: {refine_stats['removed']} problematic reviews")
+        print(f"   - Regenerated: {refine_stats['regenerated']} new reviews")
+        
+        # Generate new report for refined reviews
+        print(f"   - Generating new quality report...")
+        new_report = quality_reporter.generate_report(refined_reviews, sampled_real_reviews)
+        new_report['domain_validation'] = domain_validation
+        new_score = new_report['quality_score']['overall']
+        
+        print(f"   📊 New Quality Score: {new_score:.1f}/100 (was {best_score:.1f}/100)")
+        
+        # Keep the best version
+        if new_score > best_score:
+            print(f"   ✅ Improvement! Keeping refined version (+{new_score - best_score:.1f} points)")
+            best_reviews = refined_reviews
+            best_report = new_report
+            best_score = new_score
+        else:
+            print(f"   ⚠️  No improvement. Keeping previous version.")
+            break  # Stop if no improvement
+    
+    # Use the best version
+    reviews = best_reviews
+    report = best_report
+    
+    print(f"\n✅ Final Quality Score: {best_score:.1f}/100")
+    
+    # Save final reports
+    quality_reporter.save_report(report, report_path_json)
+    quality_reporter.save_report_markdown(report, report_path_md)
+    
+    print(f"📄 Final report saved to: {report_path_md}")
+    print(f"📄 Final JSON report saved to: {report_path_json}")
+    
+    # Generate comparison plots
+    if sampled_real_reviews:
+        print(f"📊 Generating comparison plots...")
+        quality_reporter.generate_comparison_plots(reviews, sampled_real_reviews, report_dir)
+        print(f"✅ Plots saved to: {report_dir}/")
+    
+    # Generate distribution analysis plots
+    print(f"📈 Generating distribution analysis...")
+    quality_reporter.generate_distribution_plots(reviews, report_dir)
+    print(f"✅ Distribution analysis saved to: {report_dir}/distribution_analysis.png")
     
     # Print summary
     quality_reporter.print_summary(report)
