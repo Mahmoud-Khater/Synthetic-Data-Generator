@@ -1,7 +1,7 @@
 # Configuration for synthetic review generation
 
 # Number of reviews to generate
-num_reviews: 10
+num_reviews: 100
 
 # Rating distribution (should sum to 1.0)
 rating_distribution:
@@ -47,6 +47,41 @@ personas:
       - "focuses on professionalism and comfort for long hours"
       - "mentions office or workplace context"
       - "values quality and longevity"
+  
+  - name: "tech_enthusiast"
+    description: "Early adopter interested in innovative features"
+    traits:
+      - "mentions technical specifications and features"
+      - "compares to latest models"
+      - "uses tech-savvy language"
+  
+  - name: "parent_shopper"
+    description: "Parent buying shoes for family members"
+    traits:
+      - "mentions family context and children"
+      - "emphasizes safety and comfort"
+      - "values practicality and longevity"
+  
+  - name: "senior_buyer"
+    description: "Older customer with specific comfort needs"
+    traits:
+      - "prioritizes comfort and ease of use"
+      - "mentions health or mobility considerations"
+      - "values traditional quality"
+  
+  - name: "minimalist"
+    description: "Prefers simple, essential products"
+    traits:
+      - "brief and concise reviews"
+      - "focuses on essential features only"
+      - "no-nonsense approach"
+  
+  - name: "quality_seeker"
+    description: "Premium buyer who prioritizes quality over price"
+    traits:
+      - "examines craftsmanship and materials"
+      - "willing to pay more for quality"
+      - "detail-oriented observations"
 
 # Review characteristics
 review_length:
