@@ -89,7 +89,7 @@ def example_batch_generation():
     reviews = generate_batch_reviews(
         personas=EXAMPLE_PERSONAS,
         num_reviews=10,
-        max_attempts=3
+        max_attempts=4
     )
     
     print(f"\n✅ Generated {len(reviews)} reviews")

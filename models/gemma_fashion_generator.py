@@ -4,12 +4,10 @@ Gemma Fashion-based review generator using local model.
 import os
 from typing import Dict, List, Optional
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
+from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline, AutoConfig
 from models.base_generator import BaseGenerator
 
-
 class GemmaFashionGenerator(BaseGenerator):
-    """Review generator using local gemma-fashion-tuner model."""
     
     def __init__(self, config: Dict, token: Optional[str] = None):
         """
@@ -32,74 +30,93 @@ class GemmaFashionGenerator(BaseGenerator):
              raise RuntimeError(f"Could not find model snapshot in {model_dir}")
 
         self.token = token or os.getenv('HUGGINGFACE_TOKEN')
-        
+        self.model = None
+        self.tokenizer = None
+        self.generator = None
+
+    def load(self):
+        """Load the model if not already loaded."""
+        if self.model is not None:
+            return
+
         print(f"Loading Gemma Fashion model from: {self.model_path}...")
         
-        # Initialize tokenizer and model
+        # Initialize tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(
             self.model_path,
             token=self.token,
+            use_fast=True,
             trust_remote_code=True
         )
+
+        if self.tokenizer.pad_token_id is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
         
-        # Load model with appropriate settings
+        # Load model with explicit CPU settings as requested
         self.model = AutoModelForCausalLM.from_pretrained(
             self.model_path,
             token=self.token,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            device_map="auto" if torch.cuda.is_available() else None,
+            device_map=None,        # CPU only
+            torch_dtype=torch.float32,  # CPU friendly
             trust_remote_code=True
         )
         
-        # Create text generation pipeline
-        self.generator = pipeline(
-            "text-generation",
-            model=self.model,
-            tokenizer=self.tokenizer,
-            device_map="auto" if torch.cuda.is_available() else None
-        )
+        self.model.to("cpu")
+        self.model.eval()
         
-        print(f"✓ Model loaded successfully!")
-    
+        print(f"✓ Gemma Model loaded successfully (CPU mode)!")
+
+    def unload(self):
+        """Unload model and free memory."""
+        if self.model is not None:
+            print("Unloading Gemma Model...")
+            del self.model
+            del self.tokenizer
+            self.model = None
+            self.tokenizer = None
+            
+            import gc
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+            print("✓ Gemma Model unloaded!")
+
     def generate_review(self, rating: int, persona: Dict, real_reviews: List[str]) -> str:
         """
         Generate a review using Gemma Fashion model.
-        
-        Args:
-            rating: The rating (0-4) for this review
-            persona: The persona dictionary to use
-            real_reviews: List of real reviews for context
-            
-        Returns:
-            Generated review text
         """
+        self.load()
         prompt = self.build_prompt(rating, persona, real_reviews)
-        
+        print(prompt)
         try:
-            # Generate text
-            outputs = self.generator(
-                prompt,
-                max_new_tokens=self.generation_params.get('max_tokens', 200),
-                temperature=self.generation_params.get('temperature', 0.8),
-                top_p=self.generation_params.get('top_p', 0.9),
-                do_sample=True,
-                num_return_sequences=1,
-                pad_token_id=self.tokenizer.eos_token_id,
-                repetition_penalty=1.15,
-                no_repeat_ngram_size=3,
-                eos_token_id=self.tokenizer.eos_token_id
-            )
+            # Tokenize
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            inputs = inputs.to("cpu") # Ensure inputs are on CPU
             
-            # Extract generated text
-            generated_text = outputs[0]['generated_text']
+            # Generate
+            with torch.no_grad():
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=self.generation_params.get('max_tokens', 200),
+                    do_sample=True,
+                    temperature=self.generation_params.get('temperature', 0.7),
+                    top_p=self.generation_params.get('top_p', 0.9),
+                    repetition_penalty=1.1,
+                    eos_token_id=self.tokenizer.eos_token_id,
+                    pad_token_id=self.tokenizer.eos_token_id
+                )
+            
+            # Decode
+            generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
             
             # Remove the prompt from the output
-            review_text = generated_text[len(prompt):].strip()
-            
+            # gen_only = outputs[0][inputs["input_ids"].shape[-1]:]
+            # review_text = self.tokenizer.decode(gen_only, skip_special_tokens=True).strip()
+            review_text = generated_text
             # Clean up the review
             # Remove quotes if wrapped
-            if review_text.startswith('"') and review_text.endswith('"'):
-                review_text = review_text[1:-1]
+            # if review_text.startswith('"') and review_text.endswith('"'):
+            #     review_text = review_text[1:-1]
             
             # Take only the first paragraph/sentence group
             lines = review_text.split('\n')
