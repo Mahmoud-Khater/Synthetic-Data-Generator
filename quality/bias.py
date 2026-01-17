@@ -29,11 +29,11 @@ class BiasAnalyzer:
         # Calculate actual distribution
         rating_counts = Counter(ratings)
         total = len(ratings)
-        actual_dist = {r: rating_counts.get(r, 0) / total for r in range(1, 6)}
+        actual_dist = {r: rating_counts.get(r, 0) / total for r in range(5)}  # 0, 1, 2, 3, 4
         
         # Calculate deviation from expected
         deviations = {}
-        for rating in range(1, 6):
+        for rating in range(5):  # 0, 1, 2, 3, 4
             expected = expected_dist.get(rating, 0)
             actual = actual_dist.get(rating, 0)
             deviation = abs(actual - expected)
@@ -47,7 +47,7 @@ class BiasAnalyzer:
             'expected_distribution': {k: round(v, 4) for k, v in expected_dist.items()},
             'deviations': deviations,
             'total_deviation': round(total_deviation, 4),
-            'is_biased': total_deviation > 0.15  # Threshold for significant bias
+            'is_biased': total_deviation > 0.25  # Threshold for significant bias
         }
     
     def analyze_sentiment_consistency(self, reviews: List[Dict]) -> Dict[str, any]:
@@ -80,15 +80,15 @@ class BiasAnalyzer:
             pos_count = sum(1 for word in positive_words if word in text)
             neg_count = sum(1 for word in negative_words if word in text)
             
-            # Check for inconsistencies
-            if rating >= 4 and neg_count > pos_count:
+            # Check for inconsistencies (0-4 rating scale)
+            if rating >= 3 and neg_count > pos_count:  # 3-4 are high ratings
                 inconsistencies.append({
                     'rating': rating,
                     'issue': 'High rating but negative sentiment',
                     'pos_words': pos_count,
                     'neg_words': neg_count
                 })
-            elif rating <= 2 and pos_count > neg_count:
+            elif rating <= 1 and pos_count > neg_count:  # 0-1 are low ratings
                 inconsistencies.append({
                     'rating': rating,
                     'issue': 'Low rating but positive sentiment',

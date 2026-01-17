@@ -1,15 +1,19 @@
 # Configuration for synthetic review generation
 
 # Number of reviews to generate
-num_reviews: 10
+num_reviews: 400
+
+# Maximum attempts per review (for cascading fallback)
+# Attempt 1: DeepSeek, Attempt 2: Real Review, Attempt 3: Azure OpenAI, Attempt 4+: Real Review
+max_attempts: 4
 
 # Rating distribution (should sum to 1.0)
 rating_distribution:
-  1: 0.05  # 5% - Very negative
-  2: 0.10  # 10% - Negative
-  3: 0.20  # 20% - Neutral
-  4: 0.35  # 35% - Positive
-  5: 0.30  # 30% - Very positive
+  0: 0.10  # 10% - Very negative
+  1: 0.15  # 15% - Negative
+  2: 0.30  # 30% - Neutral
+  3: 0.25  # 25% - Positive
+  4: 0.20  # 20% - Very positive
 
 # Reviewer personas
 personas:
@@ -47,16 +51,57 @@ personas:
       - "focuses on professionalism and comfort for long hours"
       - "mentions office or workplace context"
       - "values quality and longevity"
+  
+  - name: "tech_enthusiast"
+    description: "Early adopter interested in innovative features"
+    traits:
+      - "mentions technical specifications and features"
+      - "compares to latest models"
+      - "uses tech-savvy language"
+  
+  - name: "parent_shopper"
+    description: "Parent buying shoes for family members"
+    traits:
+      - "mentions family context and children"
+      - "emphasizes safety and comfort"
+      - "values practicality and longevity"
+  
+  - name: "senior_buyer"
+    description: "Older customer with specific comfort needs"
+    traits:
+      - "prioritizes comfort and ease of use"
+      - "mentions health or mobility considerations"
+      - "values traditional quality"
+  
+  - name: "minimalist"
+    description: "Prefers simple, essential products"
+    traits:
+      - "brief and concise reviews"
+      - "focuses on essential features only"
+      - "no-nonsense approach"
+  
+  - name: "quality_seeker"
+    description: "Premium buyer who prioritizes quality over price"
+    traits:
+      - "examines craftsmanship and materials"
+      - "willing to pay more for quality"
+      - "detail-oriented observations"
 
 # Review characteristics
 review_length:
-  min_words: 5
-  max_words: 150
+  min_words: 2
+  max_words: 75
 
 # Temperature settings for generation
 generation_params:
-  temperature: 0.8
-  max_tokens: 1000
+  temperature: 1.1  # Maximum diversity - reduced repetition
+  max_tokens: 250   # Increased for variable length
+  top_p: 0.9
+
+# Review parameters (for quality assessment)
+review_params:
+  temperature: 0.3  # Lower temperature for consistent evaluations
+  max_tokens: 500
   top_p: 0.9
 
 # Product context (can be customized)

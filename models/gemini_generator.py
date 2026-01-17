@@ -43,7 +43,7 @@ class GeminiGenerator(BaseGenerator):
         Generate a review using Gemini API.
         
         Args:
-            rating: The rating (1-5) for this review
+            rating: The rating (0-4) for this review
             persona: The persona dictionary to use
             real_reviews: List of real reviews for context
             

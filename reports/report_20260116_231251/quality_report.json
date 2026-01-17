@@ -1,0 +1,235 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-16T23:12:57.788180",
+    "num_synthetic_reviews": 10,
+    "num_real_reviews": 8,
+    "provider": "azure_openai_gpt-4.1-mini"
+  },
+  "quality_score": {
+    "overall": 62.76,
+    "breakdown": {
+      "diversity": 40.03,
+      "bias": 45,
+      "realism": 100
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.4535,
+      "unique_tokens": 507,
+      "total_tokens": 1118,
+      "avg_unique_per_review": 91.5,
+      "top_10_token_ratio": 0.2129
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.6528,
+      "max_similarity": 0.8381,
+      "min_similarity": 0.4576,
+      "std_similarity": 0.0879
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0803,
+      "std_tfidf_similarity": 0.0293
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.1,
+        "1": 0.2,
+        "2": 0.3,
+        "3": 0.2,
+        "4": 0.2
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.0,
+        "1": 0.05,
+        "2": 0.0,
+        "3": 0.05,
+        "4": 0.0
+      },
+      "total_deviation": 0.1,
+      "is_biased": false
+    },
+    "sentiment_consistency": {
+      "total_reviews": 10,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 10,
+      "unique_reviews": 10,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "the materials feel",
+          "count": 5,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "something to be",
+          "count": 3,
+          "frequency": 0.3
+        },
+        {
+          "phrase": "materials feel sturdy,",
+          "count": 3,
+          "frequency": 0.3
+        },
+        {
+          "phrase": "the materials feel sturdy,",
+          "count": 3,
+          "frequency": 0.3
+        },
+        {
+          "phrase": "missed the mark",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "left something to",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "to pair with",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "left something to be",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "which suits my",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "bit more cushioning",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "feel sturdy, promising",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "a bit more cushioning",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "materials feel sturdy, promising",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "stepping into these",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "into these shoes",
+          "count": 2,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "stepping into these shoes",
+          "count": 2,
+          "frequency": 0.2
+        }
+      ],
+      "has_repetition_issues": true
+    },
+    "length_distribution": {
+      "avg_length": 110.2,
+      "std_length": 9.04,
+      "min_length": 96,
+      "max_length": 122,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 10,
+        "fit": 2,
+        "quality": 4,
+        "style": 2,
+        "durability": 7,
+        "price": 0,
+        "sizing": 8
+      },
+      "reviews_with_aspects": 10,
+      "total_reviews": 10,
+      "coverage_rate": 1.0,
+      "avg_mentions_per_aspect": 4.71,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 50.91,
+      "min_score": 38.32,
+      "max_score": 58.6,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 10,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 10,
+      "total_reviews": 10,
+      "pronoun_usage_rate": 1.0,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": {
+    "vocabulary": {
+      "synthetic_ttr": 0.4535,
+      "real_ttr": 0.78,
+      "ttr_difference": 0.3265
+    },
+    "length": {
+      "synthetic_avg": 110.2,
+      "real_avg": 12.5,
+      "length_difference": 97.7
+    },
+    "similarity_to_real": {
+      "avg_max_similarity": 0.4388,
+      "min_similarity": 0.3579,
+      "max_similarity": 0.5714,
+      "interpretation": "High similarity (>0.7) may indicate copying; very low (<0.3) may indicate unrealistic content"
+    }
+  },
+  "recommendations": [
+    "Repetitive phrases detected. Increase generation diversity or use more varied prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 10,
+    "shoe_related_count": 10,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.8973561873861989,
+    "avg_keyword_count": 12.1,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}

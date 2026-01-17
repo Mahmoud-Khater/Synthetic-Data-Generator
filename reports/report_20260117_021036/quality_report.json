@@ -1,0 +1,256 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-17T02:10:42.700030",
+    "num_synthetic_reviews": 5,
+    "num_real_reviews": 3,
+    "provider": "unknown"
+  },
+  "quality_score": {
+    "overall": 62.03,
+    "breakdown": {
+      "diversity": 60.95,
+      "bias": 25,
+      "realism": 100
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.6823,
+      "unique_tokens": 189,
+      "total_tokens": 277,
+      "avg_unique_per_review": 50.4,
+      "top_10_token_ratio": 0.2238
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.4633,
+      "max_similarity": 0.6244,
+      "min_similarity": 0.2901,
+      "std_similarity": 0.0945
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0481,
+      "std_tfidf_similarity": 0.0372
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.0,
+        "1": 0.2,
+        "2": 0.4,
+        "3": 0.2,
+        "4": 0.2
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.1,
+        "1": 0.05,
+        "2": 0.1,
+        "3": 0.05,
+        "4": 0.0
+      },
+      "total_deviation": 0.3,
+      "is_biased": true
+    },
+    "sentiment_consistency": {
+      "total_reviews": 5,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 5,
+      "unique_reviews": 5,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "blasted through a",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "through a pickup",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "a pickup basketball",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "pickup basketball game",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "basketball game in",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "game in these",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "in these disasters,",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "these disasters, and",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "disasters, and the",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "and the soles",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "the soles started",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "soles started shredding",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "started shredding midway.",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "shredding midway. gym",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "midway. gym squats?",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "gym squats? agonizing",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "squats? agonizing pinch",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "agonizing pinch at",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "pinch at the",
+          "count": 1,
+          "frequency": 0.2
+        },
+        {
+          "phrase": "at the toes",
+          "count": 1,
+          "frequency": 0.2
+        }
+      ],
+      "has_repetition_issues": true
+    },
+    "length_distribution": {
+      "avg_length": 56.6,
+      "std_length": 7.55,
+      "min_length": 45,
+      "max_length": 66,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 2,
+        "fit": 0,
+        "quality": 2,
+        "style": 0,
+        "durability": 1,
+        "price": 0,
+        "sizing": 3
+      },
+      "reviews_with_aspects": 5,
+      "total_reviews": 5,
+      "coverage_rate": 1.0,
+      "avg_mentions_per_aspect": 1.14,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 60.05,
+      "min_score": 39.66,
+      "max_score": 67.82,
+      "interpretation": "Standard",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 5,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 5,
+      "total_reviews": 5,
+      "pronoun_usage_rate": 1.0,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": {
+    "vocabulary": {
+      "synthetic_ttr": 0.6823,
+      "real_ttr": 1.0,
+      "ttr_difference": 0.3177
+    },
+    "length": {
+      "synthetic_avg": 56.6,
+      "real_avg": 4.67,
+      "length_difference": 51.93
+    },
+    "similarity_to_real": {
+      "avg_max_similarity": 0.2227,
+      "min_similarity": 0.1925,
+      "max_similarity": 0.2612,
+      "interpretation": "High similarity (>0.7) may indicate copying; very low (<0.3) may indicate unrealistic content"
+    }
+  },
+  "recommendations": [
+    "Rating distribution deviates from expected. Adjust generation parameters or sampling.",
+    "Repetitive phrases detected. Increase generation diversity or use more varied prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 5,
+    "shoe_related_count": 5,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.9016949152542374,
+    "avg_keyword_count": 7.2,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}

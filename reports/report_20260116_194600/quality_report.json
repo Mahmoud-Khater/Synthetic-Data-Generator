@@ -1,0 +1,240 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-16T19:46:06.124678",
+    "num_synthetic_reviews": 3,
+    "num_real_reviews": 0,
+    "provider": "azure_openai_gpt-4.1-mini"
+  },
+  "quality_score": {
+    "overall": 55.1,
+    "breakdown": {
+      "diversity": 37.83,
+      "bias": 25,
+      "realism": 100
+    },
+    "grade": "F (Unacceptable)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.5788,
+      "unique_tokens": 169,
+      "total_tokens": 292,
+      "avg_unique_per_review": 77.0,
+      "top_10_token_ratio": 0.2705
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.8222,
+      "max_similarity": 0.8754,
+      "min_similarity": 0.7891,
+      "std_similarity": 0.038
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.1862,
+      "std_tfidf_similarity": 0.0567
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0,
+        "5": 1.0
+      },
+      "expected_distribution": {
+        "1": 0.05,
+        "2": 0.1,
+        "3": 0.2,
+        "4": 0.35,
+        "5": 0.3
+      },
+      "deviations": {
+        "1": 0.05,
+        "2": 0.1,
+        "3": 0.2,
+        "4": 0.35,
+        "5": 0.7
+      },
+      "total_deviation": 1.4,
+      "is_biased": true
+    },
+    "sentiment_consistency": {
+      "total_reviews": 3,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 3,
+      "unique_reviews": 3,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "these shoes are",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "fit is spot-on—true",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "is spot-on—true to",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "spot-on—true to size",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "to size with",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "the fit is spot-on—true",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "fit is spot-on—true to",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "is spot-on—true to size",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "spot-on—true to size with",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "shoes are a",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "are a perfect",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "a perfect blend",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "perfect blend of",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "blend of cutting-edge",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "of cutting-edge design",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "cutting-edge design and",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "design and practical",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "and practical innovation.",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "practical innovation. the",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "innovation. the fit",
+          "count": 1,
+          "frequency": 0.3333
+        }
+      ],
+      "has_repetition_issues": true
+    },
+    "length_distribution": {
+      "avg_length": 101.0,
+      "std_length": 10.03,
+      "min_length": 87,
+      "max_length": 110,
+      "is_too_uniform": false
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 3,
+        "fit": 3,
+        "quality": 3,
+        "style": 3,
+        "durability": 2,
+        "price": 3,
+        "sizing": 1
+      },
+      "reviews_with_aspects": 3,
+      "total_reviews": 3,
+      "coverage_rate": 1.0,
+      "avg_mentions_per_aspect": 2.57,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 54.97,
+      "min_score": 41.68,
+      "max_score": 64.73,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 3,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 2,
+      "total_reviews": 3,
+      "pronoun_usage_rate": 0.6667,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": null,
+  "recommendations": [
+    "Reviews are too similar. Consider increasing temperature or using more diverse personas.",
+    "Rating distribution deviates from expected. Adjust generation parameters or sampling.",
+    "Repetitive phrases detected. Increase generation diversity or use more varied prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 3,
+    "shoe_related_count": 3,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.923076923076923,
+    "avg_keyword_count": 13.333333333333334,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}

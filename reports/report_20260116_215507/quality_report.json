@@ -1,0 +1,170 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-16T21:55:14.887008",
+    "num_synthetic_reviews": 30,
+    "num_real_reviews": 28,
+    "provider": "azure_openai_gpt-4.1-mini"
+  },
+  "quality_score": {
+    "overall": 79.14,
+    "breakdown": {
+      "diversity": 30.46,
+      "bias": 100,
+      "realism": 100
+    },
+    "grade": "C (Acceptable)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.2815,
+      "unique_tokens": 899,
+      "total_tokens": 3194,
+      "avg_unique_per_review": 87.8,
+      "top_10_token_ratio": 0.1944
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.6722,
+      "max_similarity": 0.8651,
+      "min_similarity": 0.4609,
+      "std_similarity": 0.088
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0848,
+      "std_tfidf_similarity": 0.0545
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.0333,
+        "1": 0.1667,
+        "2": 0.4333,
+        "3": 0.1667,
+        "4": 0.2
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.0667,
+        "1": 0.0167,
+        "2": 0.1333,
+        "3": 0.0833,
+        "4": 0.0
+      },
+      "total_deviation": 0.3,
+      "is_biased": false
+    },
+    "sentiment_consistency": {
+      "total_reviews": 30,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 30,
+      "unique_reviews": 30,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "the material feels",
+          "count": 5,
+          "frequency": 0.1667
+        },
+        {
+          "phrase": "the materials feel",
+          "count": 5,
+          "frequency": 0.1667
+        }
+      ],
+      "has_repetition_issues": false
+    },
+    "length_distribution": {
+      "avg_length": 105.63,
+      "std_length": 12.86,
+      "min_length": 75,
+      "max_length": 129,
+      "is_too_uniform": false
+    },
+    "overall_bias_detected": false
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 28,
+        "fit": 6,
+        "quality": 13,
+        "style": 2,
+        "durability": 15,
+        "price": 1,
+        "sizing": 23
+      },
+      "reviews_with_aspects": 30,
+      "total_reviews": 30,
+      "coverage_rate": 1.0,
+      "avg_mentions_per_aspect": 12.57,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 51.55,
+      "min_score": 21.91,
+      "max_score": 78.91,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 1,
+      "total_reviews": 30,
+      "ai_pattern_rate": 0.0333,
+      "is_realistic": true,
+      "examples": [
+        {
+          "review_snippet": "Disappointment settled quickly with these shoes, as the leather exhibited noticeable creasing and a ...",
+          "pattern": "\\bi cannot\\b"
+        }
+      ]
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 27,
+      "total_reviews": 30,
+      "pronoun_usage_rate": 0.9,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": {
+    "vocabulary": {
+      "synthetic_ttr": 0.2815,
+      "real_ttr": 0.3937,
+      "ttr_difference": 0.1122
+    },
+    "length": {
+      "synthetic_avg": 105.63,
+      "real_avg": 37.93,
+      "length_difference": 67.7
+    },
+    "similarity_to_real": {
+      "avg_max_similarity": 0.5268,
+      "min_similarity": 0.4537,
+      "max_similarity": 0.5925,
+      "interpretation": "High similarity (>0.7) may indicate copying; very low (<0.3) may indicate unrealistic content"
+    }
+  },
+  "recommendations": [
+    "Limited vocabulary diversity. Encourage more varied word choices in prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 30,
+    "shoe_related_count": 30,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.8596441540112896,
+    "avg_keyword_count": 10.233333333333333,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}

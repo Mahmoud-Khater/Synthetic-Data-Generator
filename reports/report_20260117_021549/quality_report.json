@@ -1,0 +1,239 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-17T02:16:09.964966",
+    "num_synthetic_reviews": 3,
+    "num_real_reviews": 0,
+    "provider": "unknown"
+  },
+  "quality_score": {
+    "overall": 62.12,
+    "breakdown": {
+      "diversity": 61.23,
+      "bias": 25,
+      "realism": 100
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.7362,
+      "unique_tokens": 120,
+      "total_tokens": 163,
+      "avg_unique_per_review": 49.67,
+      "top_10_token_ratio": 0.227
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.5116,
+      "max_similarity": 0.5275,
+      "min_similarity": 0.5019,
+      "std_similarity": 0.0114
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0739,
+      "std_tfidf_similarity": 0.0302
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.3333,
+        "3": 0.3333,
+        "4": 0.3333
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.0333,
+        "3": 0.0833,
+        "4": 0.1333
+      },
+      "total_deviation": 0.4999,
+      "is_biased": true
+    },
+    "sentiment_consistency": {
+      "total_reviews": 3,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 3,
+      "unique_reviews": 3,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "sturdy enough to",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "enough to last",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "sturdy enough to last",
+          "count": 2,
+          "frequency": 0.6667
+        },
+        {
+          "phrase": "slipping these on",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "these on for",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "for my usual",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "my usual errands",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "usual errands felt",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "errands felt pretty",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "felt pretty comfy",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "pretty comfy overall.",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "comfy overall. they",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "overall. they handled",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "they handled walking",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "handled walking the",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "walking the dog",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "the dog and",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "dog and quick",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "and quick grocery",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "quick grocery trips",
+          "count": 1,
+          "frequency": 0.3333
+        }
+      ],
+      "has_repetition_issues": true
+    },
+    "length_distribution": {
+      "avg_length": 55.33,
+      "std_length": 6.24,
+      "min_length": 47,
+      "max_length": 62,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 1,
+        "fit": 0,
+        "quality": 1,
+        "style": 0,
+        "durability": 0,
+        "price": 0,
+        "sizing": 1
+      },
+      "reviews_with_aspects": 2,
+      "total_reviews": 3,
+      "coverage_rate": 0.6667,
+      "avg_mentions_per_aspect": 0.43,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 52.59,
+      "min_score": 38.01,
+      "max_score": 77.85,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 3,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 3,
+      "total_reviews": 3,
+      "pronoun_usage_rate": 1.0,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": null,
+  "recommendations": [
+    "Rating distribution deviates from expected. Adjust generation parameters or sampling.",
+    "Repetitive phrases detected. Increase generation diversity or use more varied prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 3,
+    "shoe_related_count": 3,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.9491525423728814,
+    "avg_keyword_count": 7.333333333333333,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}
