@@ -1,0 +1,154 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-17T11:34:57.263467",
+    "num_synthetic_reviews": 50,
+    "num_real_reviews": 48,
+    "provider": "unknown"
+  },
+  "quality_score": {
+    "overall": 70.71,
+    "breakdown": {
+      "diversity": 37.38,
+      "bias": 70,
+      "realism": 100
+    },
+    "grade": "C (Acceptable)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.335,
+      "unique_tokens": 852,
+      "total_tokens": 2543,
+      "avg_unique_per_review": 46.96,
+      "top_10_token_ratio": 0.1994
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.5875,
+      "max_similarity": 0.7931,
+      "min_similarity": 0.3587,
+      "std_similarity": 0.1027
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0486,
+      "std_tfidf_similarity": 0.039
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.1,
+        "1": 0.16,
+        "2": 0.3,
+        "3": 0.24,
+        "4": 0.2
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.0,
+        "1": 0.01,
+        "2": 0.0,
+        "3": 0.01,
+        "4": 0.0
+      },
+      "total_deviation": 0.02,
+      "is_biased": false
+    },
+    "sentiment_consistency": {
+      "total_reviews": 50,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 50,
+      "unique_reviews": 50,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [],
+      "has_repetition_issues": false
+    },
+    "length_distribution": {
+      "avg_length": 51.6,
+      "std_length": 7.27,
+      "min_length": 37,
+      "max_length": 65,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 22,
+        "fit": 5,
+        "quality": 14,
+        "style": 5,
+        "durability": 12,
+        "price": 2,
+        "sizing": 18
+      },
+      "reviews_with_aspects": 41,
+      "total_reviews": 50,
+      "coverage_rate": 0.82,
+      "avg_mentions_per_aspect": 11.14,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 55.06,
+      "min_score": 16.51,
+      "max_score": 93.77,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 50,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 40,
+      "total_reviews": 50,
+      "pronoun_usage_rate": 0.8,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": {
+    "vocabulary": {
+      "synthetic_ttr": 0.335,
+      "real_ttr": 0.3342,
+      "ttr_difference": 0.0008
+    },
+    "length": {
+      "synthetic_avg": 51.6,
+      "real_avg": 39.23,
+      "length_difference": 12.37
+    },
+    "similarity_to_real": {
+      "avg_max_similarity": 0.596,
+      "min_similarity": 0.4574,
+      "max_similarity": 0.6914,
+      "interpretation": "High similarity (>0.7) may indicate copying; very low (<0.3) may indicate unrealistic content"
+    }
+  },
+  "recommendations": [
+    "Quality metrics look good! No major issues detected."
+  ],
+  "domain_validation": {
+    "total_reviews": 50,
+    "shoe_related_count": 50,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.988174706649283,
+    "avg_keyword_count": 8.32,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}
