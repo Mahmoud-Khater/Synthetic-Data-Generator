@@ -3,6 +3,10 @@
 # Number of reviews to generate
 num_reviews: 100
 
+# Maximum attempts per review (for cascading fallback)
+# Attempt 1: DeepSeek, Attempt 2: Real Review, Attempt 3: Azure OpenAI, Attempt 4+: Real Review
+max_attempts: 4
+
 # Rating distribution (should sum to 1.0)
 rating_distribution:
   0: 0.10  # 10% - Very negative
@@ -85,8 +89,8 @@ personas:
 
 # Review characteristics
 review_length:
-  min_words: 5
-  max_words: 150
+  min_words: 2
+  max_words: 75
 
 # Temperature settings for generation
 generation_params:

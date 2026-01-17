@@ -349,9 +349,10 @@ class QualityReporter:
 """
         # Add rating distribution table - use 0-4 rating scale
         for rating in range(5):  # 0, 1, 2, 3, 4
-            actual = report['bias']['rating_distribution']['actual_distribution'].get(str(rating), 0)
-            expected = report['bias']['rating_distribution']['expected_distribution'].get(str(rating), 0)
-            deviation = report['bias']['rating_distribution']['deviations'].get(str(rating), 0)
+            # Use integer keys since that's how they're stored
+            actual = report['bias']['rating_distribution']['actual_distribution'].get(rating, 0)
+            expected = report['bias']['rating_distribution']['expected_distribution'].get(rating, 0)
+            deviation = report['bias']['rating_distribution']['deviations'].get(rating, 0)
             md_content += f"| {rating} | {actual*100:.1f}% | {expected*100:.1f}% | {abs(deviation)*100:.1f}% |\n"
         
         md_content += f"""
@@ -404,10 +405,16 @@ class QualityReporter:
 
 | Metric | Synthetic | Real | Difference |
 |--------|-----------|------|------------|
-| Vocabulary (TTR) | {report['comparison_with_real']['vocabulary']['synthetic_ttr']:.3f} | {report['comparison_with_real']['vocabulary']['real_ttr']:.3f} | {report['comparison_with_real']['vocabulary']['ttr_difference']:.3f} |
-| Avg Length (words) | {report['comparison_with_real']['length']['synthetic_avg']:.1f} | {report['comparison_with_real']['length']['real_avg']:.1f} | {report['comparison_with_real']['length']['length_difference']:.1f} |
-| Similarity to Real | {report['comparison_with_real']['similarity_to_real']['avg_max_similarity']:.3f} | - | - |
+"""
+        # Comparison with real reviews (if available)
+        if report.get('comparison_with_real') and report['comparison_with_real'].get('vocabulary'):
+            md_content += f"| Vocabulary (TTR) | {report['comparison_with_real']['vocabulary']['synthetic_ttr']:.3f} | {report['comparison_with_real']['vocabulary']['real_ttr']:.3f} | {report['comparison_with_real']['vocabulary']['ttr_difference']:.3f} |\n"
+            md_content += f"| Avg Length (words) | {report['comparison_with_real']['length']['synthetic_avg']:.1f} | {report['comparison_with_real']['length']['real_avg']:.1f} | {report['comparison_with_real']['length']['length_difference']:.1f} |\n"
+            md_content += f"| Similarity to Real | {report['comparison_with_real']['similarity_to_real']['avg_max_similarity']:.3f} | - | - |\n"
+        else:
+            md_content += "| No comparison data available |\n"
 
+        md_content += f"""
 ---
 
 ## Domain Validation

@@ -1,0 +1,239 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-17T02:18:34.864369",
+    "num_synthetic_reviews": 3,
+    "num_real_reviews": 0,
+    "provider": "unknown"
+  },
+  "quality_score": {
+    "overall": 63.56,
+    "breakdown": {
+      "diversity": 66.02,
+      "bias": 25,
+      "realism": 100
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.7973,
+      "unique_tokens": 118,
+      "total_tokens": 148,
+      "avg_unique_per_review": 45.0,
+      "top_10_token_ratio": 0.2365
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.477,
+      "max_similarity": 0.5773,
+      "min_similarity": 0.4216,
+      "std_similarity": 0.071
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0245,
+      "std_tfidf_similarity": 0.0093
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.3333,
+        "3": 0.3333,
+        "4": 0.3333
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.0333,
+        "3": 0.0833,
+        "4": 0.1333
+      },
+      "total_deviation": 0.4999,
+      "is_biased": true
+    },
+    "sentiment_consistency": {
+      "total_reviews": 3,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 3,
+      "unique_reviews": 3,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "trendy espadrille vibes",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "espadrille vibes lured",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "vibes lured me",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "lured me for",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "me for summer",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "for summer festivals,",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "summer festivals, yet",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "festivals, yet the",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "yet the fabric",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "the fabric frays",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "fabric frays at",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "frays at edges,",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "at edges, killing",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "edges, killing the",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "killing the polished",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "the polished look",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "polished look fast.",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "look fast. comfort",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "fast. comfort holds",
+          "count": 1,
+          "frequency": 0.3333
+        },
+        {
+          "phrase": "comfort holds up",
+          "count": 1,
+          "frequency": 0.3333
+        }
+      ],
+      "has_repetition_issues": true
+    },
+    "length_distribution": {
+      "avg_length": 50.33,
+      "std_length": 5.73,
+      "min_length": 43,
+      "max_length": 57,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 2,
+        "fit": 1,
+        "quality": 3,
+        "style": 0,
+        "durability": 1,
+        "price": 0,
+        "sizing": 1
+      },
+      "reviews_with_aspects": 3,
+      "total_reviews": 3,
+      "coverage_rate": 1.0,
+      "avg_mentions_per_aspect": 1.14,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 56.25,
+      "min_score": 54.34,
+      "max_score": 57.87,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 3,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 3,
+      "total_reviews": 3,
+      "pronoun_usage_rate": 1.0,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": null,
+  "recommendations": [
+    "Rating distribution deviates from expected. Adjust generation parameters or sampling.",
+    "Repetitive phrases detected. Increase generation diversity or use more varied prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 3,
+    "shoe_related_count": 3,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.8442655535678791,
+    "avg_keyword_count": 4.333333333333333,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}

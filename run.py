@@ -25,14 +25,16 @@ def main():
     
     # Load personas from config
     personas = config.get('personas', [])
+    max_attempts = config.get('max_attempts', 3)
     
     print(f"📋 Loaded {len(personas)} personas from config")
+    print(f"🔄 Max attempts per review: {max_attempts}")
     
     # Generate reviews
     reviews = generate_batch_reviews(
         personas=personas,
         num_reviews=num_reviews,
-        max_attempts=3
+        max_attempts=max_attempts
     )
     
     print(f"\n✅ Generated {len(reviews)} reviews")

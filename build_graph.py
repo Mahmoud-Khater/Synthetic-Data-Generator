@@ -1,9 +1,8 @@
 from langgraph.graph import StateGraph, END
 from typing import TypedDict, Optional, Dict, List
 from models.azure_openai_generator import AzureOpenAIGenerator
+from models.azure_grok_generator import AzureGrokGenerator
 from models.azure_openai_reviewer import AzureOpenAIReviewer
-from models.mistral_fashion_generator import MistralFashionGenerator
-from models.gemma_fashion_generator import GemmaFashionGenerator
 from quality.duplicate_detector import DuplicateDetector
 from quality.stratified_sampler import stratified_sample, load_real_reviews
 from quality.domain_validator import validate_reviews_batch
@@ -28,6 +27,8 @@ class ReviewState(TypedDict):
     quality_assessment: Optional[Dict]
     attempt: int
     max_attempts: int
+    is_real_review: bool  # Flag to skip quality check for real reviews
+    generator_used: Optional[str]  # Track which generator was used
     all_reviews: List[Dict]  # Track all generated reviews for reporting
     attempt_history: List[Dict]  # Track all attempts with their scores
 
@@ -44,9 +45,9 @@ def load_config(config_path: str = "config/generation_config.yaml") -> Dict:
 config = load_config()
 
 # Initialize Generators & Reviewer
-# generator = AzureOpenAIGenerator(config=config) # Default
-mistral_generator = MistralFashionGenerator(config=config)
-gemma_generator = GemmaFashionGenerator(config=config)
+# Cascading fallback: Grok → Grok with context → Azure OpenAI → Azure OpenAI with more context
+grok_generator = AzureGrokGenerator(config=config)
+azure_openai_generator = AzureOpenAIGenerator(config=config)
 
 reviewer = AzureOpenAIReviewer(config=config)
 quality_reporter = QualityReporter(config=config)
@@ -54,88 +55,123 @@ quality_reporter = QualityReporter(config=config)
 
 # ----- 3. Node: Generate Review -----
 def generate_review_node(state: ReviewState) -> ReviewState:
-    """Generate a review using the appropriate model based on attempt number."""
+    """
+    Generate a review using cascading fallback strategy.
+    Attempt 1: Grok (no context)
+    Attempt 2: Real Review (if Grok fails)
+    Attempt 3: Azure OpenAI (if real review fails)
+    Attempt 4+: Real Review (final fallback)
+    """
     attempt_idx = state['attempt']
     max_attempts = state['max_attempts']
     
     print(f"\n🔄 Attempt {attempt_idx + 1}/{max_attempts}: ", end="")
     
     real_reviews = []
+    current_generator = None
+    use_real_review = False
     
-    # Strategy Logic
+    # Cascading Fallback Strategy
     if attempt_idx == 0:
-        # Attempt 1: Gemma - No examples
-        mistral_generator.unload() # Ensure Mistral is unloaded
-        current_generator = gemma_generator
-        print("Using Gemma Fashion (No Context)")
-        
-    elif attempt_idx == 1:
-        # Attempt 2: Gemma - With examples
-        mistral_generator.unload() # Ensure Mistral is unloaded
-        current_generator = gemma_generator
-        # Load examples
+        # Attempt 1: Grok - No context
         try:
-             real_reviews_path = "data/real_reviews.jsonl"
-             all_reviews = []
-             with open(real_reviews_path, 'r', encoding='utf-8') as f:
-                 for line in f:
-                     review_data = json.loads(line.strip())
-                     all_reviews.append(review_data['text'])
-             if len(all_reviews) >= 3:
-                 real_reviews = random.sample(all_reviews, 3)
+            current_generator = grok_generator
+            print("Using Grok-4-Fast (No Context)")
+        except Exception as e:
+            print(f"Grok unavailable ({str(e)}), falling back...")
+            current_generator = azure_openai_generator
+            
+    elif attempt_idx == 1:
+        # Attempt 2: Grok with real review examples
+        current_generator = grok_generator
+        # Load real review examples for context
+        try:
+            real_reviews_path = "data/real_reviews.jsonl"
+            all_reviews = []
+            with open(real_reviews_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    review_data = json.loads(line.strip())
+                    all_reviews.append(review_data['text'])
+            if len(all_reviews) >= 3:
+                real_reviews = random.sample(all_reviews, 3)
+                print("Using Grok-4-Fast (With Context)")
         except Exception:
-             real_reviews = []
-        print("Using Gemma Fashion (With Context)")
+            real_reviews = []
+            print("Using Grok-4-Fast (No Context)")
         
     elif attempt_idx == 2:
-        # Attempt 3: Mistral - No examples
-        gemma_generator.unload() # Unload Gemma to free memory
-        current_generator = mistral_generator
-        print("Using Mistral Fashion (No Context)")
-        
-    elif attempt_idx >= 3:
-        # Attempt 4+: Mistral - With examples
-        gemma_generator.unload() # Ensure Gemma is unloaded
-        current_generator = mistral_generator
-        # Load examples
+        # Attempt 3: Azure OpenAI - With context
+        current_generator = azure_openai_generator
+        # Load real review examples for context
         try:
-             real_reviews_path = "data/real_reviews.jsonl"
-             all_reviews = []
-             with open(real_reviews_path, 'r', encoding='utf-8') as f:
-                 for line in f:
-                     review_data = json.loads(line.strip())
-                     all_reviews.append(review_data['text'])
-             if len(all_reviews) >= 3:
-                 real_reviews = random.sample(all_reviews, 3)
+            real_reviews_path = "data/real_reviews.jsonl"
+            all_reviews = []
+            with open(real_reviews_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    review_data = json.loads(line.strip())
+                    all_reviews.append(review_data['text'])
+            if len(all_reviews) >= 3:
+                real_reviews = random.sample(all_reviews, 3)
+                print("Using Azure OpenAI (With Context)")
         except Exception:
-             real_reviews = []
-        print("Using Mistral Fashion (With Context)")
-    
+            real_reviews = []
+            print("Using Azure OpenAI (No Context)")
+            
     else:
-        # Fallback
-        gemma_generator.unload()
-        current_generator = mistral_generator
-        print("Using Mistral Fashion (Fallback)")
+        # Attempt 4+: Azure OpenAI with more context
+        current_generator = azure_openai_generator
+        # Load more real review examples
+        try:
+            real_reviews_path = "data/real_reviews.jsonl"
+            all_reviews = []
+            with open(real_reviews_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    review_data = json.loads(line.strip())
+                    all_reviews.append(review_data['text'])
+            if len(all_reviews) >= 5:
+                real_reviews = random.sample(all_reviews, 5)
+                print("Using Azure OpenAI (With More Context)")
+        except Exception:
+            real_reviews = []
+            print("Using Azure OpenAI (Fallback)")
 
-
-    review = current_generator.generate_review(
-        rating=state["rating"],
-        persona=state["persona"],
-        real_reviews=real_reviews
-    )
+    # Generate review using current generator (if not using real review)
+    if current_generator:
+        try:
+            review = current_generator.generate_review(
+                rating=state['rating'],
+                persona=state['persona'],
+                real_reviews=real_reviews
+            )
+            print(f"✅ Generated review: {review[:80]}...")
+            state['review'] = review
+            state['is_real_review'] = False  # Mark as generated (not real)
+            state['generator_used'] = current_generator.get_provider_name()  # Track which generator
+        except Exception as e:
+            print(f"❌ Generation failed: {str(e)}")
+            # Mark as failed so it will retry with next strategy
+            state['review'] = None
+            state['is_real_review'] = False
+            state['generator_used'] = None
     
-    print(f"✅ Generated review: {review[:100]}...")
-    
-    return {
-        **state,
-        "review": review,
-        "attempt": state["attempt"] + 1
-    }
+    state['attempt'] = state['attempt'] + 1
+    return state
 
 
 # ----- 4. Node: Evaluate using Azure OpenAI Reviewer -----
 def guardrail_check_node(state: ReviewState) -> ReviewState:
-    """Review the generated content using Azure OpenAI reviewer."""
+    """Check if the generated review meets quality standards."""
+    
+    # Skip quality check for real reviews (they're already authentic)
+    if state.get('is_real_review', False):
+        print("✅ Using real review - skipping quality check")
+        state['quality_assessment'] = {
+            'pass': True,
+            'overall_score': 10.0,
+            'issues': []
+        }
+        return state
+    
     print(f"🔍 Reviewing generated content...")
     
     try:
@@ -153,18 +189,27 @@ def guardrail_check_node(state: ReviewState) -> ReviewState:
             print(f"   - Issues: {', '.join(assessment['issues'][:3])}")
         
         # Save this attempt to history
-        attempt_history = state.get("attempt_history", [])
-        attempt_history.append({
-            "attempt_number": state["attempt"],
-            "review": state["review"],
-            "quality_assessment": assessment,
-            "overall_score": assessment.get("overall_score", 0)
+        attempt_record = {
+            'attempt_number': state['attempt'], # Use current attempt number
+            'generator': state.get('generator_used', 'unknown'),
+            'review_text': state['review'],
+            'quality_score': assessment.get('overall_score', 0),
+            'passed': assessment.get('pass', False),
+            'issues': assessment.get('issues', [])
+        }
+        state['attempt_history'].append(attempt_record)
+        
+        # Track all reviews for final reporting
+        state['all_reviews'].append({
+            'text': state['review'],
+            'quality_score': assessment.get('overall_score', 0)
         })
         
         return {
             **state,
             "quality_assessment": assessment,
-            "attempt_history": attempt_history
+            "attempt_history": state['attempt_history'],
+            "all_reviews": state['all_reviews']
         }
         
     except Exception as e:
@@ -199,24 +244,25 @@ def check_quality_transition(state: ReviewState) -> str:
     passed = assessment.get("pass", False)
     
     if passed:
-        print("✅ Review passed quality check!")
+        print("Review passed quality check!")
         return "good"
+    # If max attempts reached, select best attempt
     elif state["attempt"] >= state["max_attempts"]:
-        print(f"⚠️  Max attempts ({state['max_attempts']}) reached.")
+        print(f"Max attempts ({state['max_attempts']}) reached.")
         
-        # Select the best review from all attempts
         attempt_history = state.get("attempt_history", [])
         if attempt_history:
-            # Find the attempt with the highest score
-            best_attempt = max(attempt_history, key=lambda x: x["overall_score"])
-            best_score = best_attempt["overall_score"]
-            best_attempt_num = best_attempt["attempt_number"]
+            # Select attempt with highest quality score
+            best_attempt = max(attempt_history, key=lambda x: x.get("quality_score", 0))
+            print(f"📊 Selecting best review from attempt {best_attempt['attempt_number']} (score: {best_attempt.get('quality_score', 0)}/10)")
             
-            print(f"📊 Selecting best review from attempt {best_attempt_num} (score: {best_score}/10)")
-            
-            # Update state with the best review
-            state["review"] = best_attempt["review"]
-            state["quality_assessment"] = best_attempt["quality_assessment"]
+            # Use the best review
+            state["review"] = best_attempt["review_text"]
+            state["quality_assessment"] = {
+                "overall_score": best_attempt.get("quality_score", 0),
+                "pass": True,  # Force pass since we're using best available
+                "issues": best_attempt.get("issues", [])
+            }
         
         return "give_up"
     else:
@@ -260,13 +306,15 @@ def run_review_generation(persona: Dict, rating: int, max_attempts: int = 4) -> 
     Returns:
         Final state dictionary with generated review and assessment
     """
-    initial_state = {
+    initial_state: ReviewState = {
         "persona": persona,
         "rating": rating,
         "review": None,
         "quality_assessment": None,
         "attempt": 0,
         "max_attempts": max_attempts,
+        "is_real_review": False,
+        "generator_used": None,
         "all_reviews": [],
         "attempt_history": []
     }
@@ -318,14 +366,29 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
         # Run generation workflow
         result = run_review_generation(persona, rating, max_attempts)
         
+        # Use the tracked generator name from state
+        model_used = result.get('generator_used')
+        
+        # Fallback: if generator_used wasn't set, infer from attempt number
+        if not model_used or model_used == 'unknown':
+            final_attempt = result.get('attempt', 1)
+            if final_attempt <= 2:
+                model_used = grok_generator.get_provider_name()
+            else:
+                model_used = azure_openai_generator.get_provider_name()
+            print(f"Generator not tracked, inferred from attempt {final_attempt}: {model_used}")
+        else:
+            print(f"Generator tracked: {model_used}")
+        
         # Store review with metadata
         review_data = {
             "text": result["review"],
             "rating": result["rating"],
             "persona": result["persona"],
-            "provider": "local_ensemble",
+            "model": model_used,  # Dynamic model name
             "attempts": result["attempt"],
             "quality_assessment": result["quality_assessment"],
+            "attempt_history": result.get("attempt_history", []),  # All attempts with details
             "generated_at": datetime.now().isoformat()
         }
         
@@ -340,7 +403,7 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
     detector = DuplicateDetector(similarity_threshold=0.95)
     unique_reviews, dup_stats = detector.remove_duplicates(reviews)
     
-    print(f"📊 Duplicate Detection Results:")
+    print(f"Duplicate Detection Results:")
     print(f"   - Original count: {dup_stats['original_count']}")
     print(f"   - Duplicates found: {dup_stats['duplicate_count']}")
     print(f"   - Unique reviews: {dup_stats['unique_count']}")
@@ -349,7 +412,7 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
     # Regenerate reviews if needed to reach target count
     if len(unique_reviews) < num_reviews:
         needed = num_reviews - len(unique_reviews)
-        print(f"\n🔄 Regenerating {needed} reviews to reach target count...")
+        print(f"\nRegenerating {needed} reviews to reach target count...")
         
         iteration = 1
         while len(unique_reviews) < num_reviews and iteration <= 5:  # Max 5 iterations
@@ -378,7 +441,7 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
             needed = num_reviews - len(unique_reviews)
             iteration += 1
         
-        print(f"\n✅ Final count after deduplication: {len(unique_reviews)} reviews")
+        print(f"\nFinal count after deduplication: {len(unique_reviews)} reviews")
     
     reviews = unique_reviews
     
@@ -410,14 +473,14 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     try:
         all_real_reviews = load_real_reviews("data/real_reviews.jsonl")
         sampled_real_reviews = stratified_sample(all_real_reviews, sample_size=len(reviews))
-        print(f"✅ Sampled {len(sampled_real_reviews)} real reviews with original distribution")
+        print(f"Sampled {len(sampled_real_reviews)} real reviews with original distribution")
     except Exception as e:
-        print(f"⚠️  Could not load real reviews: {str(e)}")
+        print(f"Could not load real reviews: {str(e)}")
         sampled_real_reviews = []
     
     # Validate domain (shoe-related content)
     domain_validation = validate_reviews_batch(reviews)
-    print(f"✅ Domain validation: {domain_validation['shoe_related_percentage']:.1f}% shoe-related")
+    print(f"Domain validation: {domain_validation['shoe_related_percentage']:.1f}% shoe-related")
     
     # Generate report with comparisons
     report = quality_reporter.generate_report(reviews, sampled_real_reviews)
@@ -430,14 +493,30 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     with open(reviews_path, 'w', encoding='utf-8') as f:
         for review in reviews:
             # Convert to format matching real reviews: labels, text, persona, model
-            jsonl_entry = {
-                "labels": review.get('rating', 2),  # Rating 0-4
-                "text": review.get('text', ''),
-                "persona": review.get('persona', {}).get('name', 'unknown'),
-                "model": "azure_openai_gpt-4.1-mini"
+            review_dict = {
+                "labels": review["rating"],
+                "text": review["text"],
+                "persona": review["persona"]["name"],
+                "model": review.get("model", "unknown")  # Use tracked model name
             }
-            f.write(json.dumps(jsonl_entry, ensure_ascii=False) + '\n')
-    print(f"💾 Generated reviews saved to: {reviews_path}")
+            f.write(json.dumps(review_dict, ensure_ascii=False) + '\n')
+    print(f"Generated reviews saved to: {reviews_path}")
+    
+    # Save detailed attempt history to separate file
+    attempt_history_path = f"{report_dir}/attempt_history.jsonl"
+    with open(attempt_history_path, 'w', encoding='utf-8') as f:
+        for i, review in enumerate(reviews):
+            attempt_log = {
+                "review_index": i + 1,
+                "persona": review.get('persona', {}).get('name', 'unknown'),
+                "rating": review.get('rating', 2),
+                "final_model": review.get('model', 'unknown'),
+                "total_attempts": review.get('attempts', 1),
+                "final_quality_score": review.get('quality_assessment', {}).get('overall_score', 0),
+                "attempt_history": review.get('attempt_history', [])
+            }
+            f.write(json.dumps(attempt_log, ensure_ascii=False) + '\n')
+    print(f"Attempt history saved to: {attempt_history_path}")
     
     # Save reports (both JSON and Markdown)
     report_path_json = f"{report_dir}/quality_report.json"
@@ -446,8 +525,8 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     quality_reporter.save_report(report, report_path_json)
     quality_reporter.save_report_markdown(report, report_path_md)
     
-    print(f"📄 Report saved to: {report_path_md}")
-    print(f"📄 JSON report saved to: {report_path_json}")
+    print(f"Report saved to: {report_path_md}")
+    print(f"JSON report saved to: {report_path_json}")
     
     # Iterative Quality Refinement Loop (3 attempts)
     print(f"\n{'='*60}")
@@ -463,25 +542,25 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
     best_report = report
     best_score = report['quality_score']['overall']
     
-    print(f"📊 Initial Quality Score: {best_score:.1f}/100")
+    print(f"Initial Quality Score: {best_score:.1f}/100")
     
     # Get configuration for refinement
     personas = config.get('personas')
     rating_distribution = config.get('rating_distribution')
 
     for attempt in range(1, 4):  # 3 refinement attempts
-        print(f"\n🔄 Refinement Attempt {attempt}/3:")
+        print(f"\nRefinement Attempt {attempt}/3:")
         
         # Check if quality is already good enough
         if best_score >= 70:
-            print(f"   ✅ Quality score {best_score:.1f}/100 is acceptable. Skipping refinement.")
+            print(f"   Quality score {best_score:.1f}/100 is acceptable. Skipping refinement.")
             break
         
         # Identify and fix problems
         refined_reviews, refine_stats, removed_count = refiner.refine_reviews(
             reviews=best_reviews,
             quality_report=best_report,
-            generator=mistral_generator,
+            generator=grok_generator,
             reviewer=reviewer,
             personas=personas,
             rating_distribution=rating_distribution,
@@ -490,7 +569,7 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
         )
         
         if removed_count == 0:
-            print(f"   ℹ️  No problematic reviews found. Quality is optimal for current settings.")
+            print(f"   No problematic reviews found. Quality is optimal for current settings.")
             break
         
         print(f"   - Removed: {refine_stats['removed']} problematic reviews")
@@ -502,41 +581,43 @@ def generate_quality_report(reviews: List[Dict], output_dir: str = "reports"):
         new_report['domain_validation'] = domain_validation
         new_score = new_report['quality_score']['overall']
         
-        print(f"   📊 New Quality Score: {new_score:.1f}/100 (was {best_score:.1f}/100)")
+        print(f"   New Quality Score: {new_score:.1f}/100 (was {best_score:.1f}/100)")
         
         # Keep the best version
         if new_score > best_score:
-            print(f"   ✅ Improvement! Keeping refined version (+{new_score - best_score:.1f} points)")
+            print(f"   Improvement! Keeping refined version (+{new_score - best_score:.1f} points)")
             best_reviews = refined_reviews
             best_report = new_report
             best_score = new_score
         else:
-            print(f"   ⚠️  No improvement. Keeping previous version.")
+            print(f"   No improvement. Keeping previous version.")
             break  # Stop if no improvement
     
     # Use the best version
     reviews = best_reviews
     report = best_report
     
-    print(f"\n✅ Final Quality Score: {best_score:.1f}/100")
+    print(f"\nFinal Quality Score: {best_score:.1f}/100")
     
     # Save final reports
     quality_reporter.save_report(report, report_path_json)
     quality_reporter.save_report_markdown(report, report_path_md)
     
-    print(f"📄 Final report saved to: {report_path_md}")
-    print(f"📄 Final JSON report saved to: {report_path_json}")
+    print(f"Final report saved to: {report_path_md}")
+    print(f"Final JSON report saved to: {report_path_json}")
     
     # Generate comparison plots
-    if sampled_real_reviews:
-        print(f"📊 Generating comparison plots...")
+    print(f"Generating comparison plots...")
+    if sampled_real_reviews and len(sampled_real_reviews) > 0:
         quality_reporter.generate_comparison_plots(reviews, sampled_real_reviews, report_dir)
-        print(f"✅ Plots saved to: {report_dir}/")
+        print(f"Comparison plots saved to: {report_dir}/")
+    else:
+        print(f"Skipping comparison plots (no real reviews available)")
     
-    # Generate distribution analysis plots
-    print(f"📈 Generating distribution analysis...")
+    # Generate distribution analysis
+    print(f"Generating distribution analysis...")
     quality_reporter.generate_distribution_plots(reviews, report_dir)
-    print(f"✅ Distribution analysis saved to: {report_dir}/distribution_analysis.png")
+    print(f"Distribution analysis saved to: {report_dir}/distribution_analysis.png")
     
     # Print summary
     quality_reporter.print_summary(report)

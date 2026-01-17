@@ -1,0 +1,239 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-17T02:26:29.676568",
+    "num_synthetic_reviews": 2,
+    "num_real_reviews": 0,
+    "provider": "unknown"
+  },
+  "quality_score": {
+    "overall": 61.29,
+    "breakdown": {
+      "diversity": 58.48,
+      "bias": 25,
+      "realism": 100
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.8261,
+      "unique_tokens": 76,
+      "total_tokens": 92,
+      "avg_unique_per_review": 42.5,
+      "top_10_token_ratio": 0.2609
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.6566,
+      "max_similarity": 0.6566,
+      "min_similarity": 0.6566,
+      "std_similarity": 0.0
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0527,
+      "std_tfidf_similarity": 0.0
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 1.0,
+        "3": 0.0,
+        "4": 0.0
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.7,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "total_deviation": 1.4,
+      "is_biased": true
+    },
+    "sentiment_consistency": {
+      "total_reviews": 2,
+      "inconsistencies_found": 0,
+      "inconsistency_rate": 0.0,
+      "is_consistent": true,
+      "examples": []
+    },
+    "repetitive_patterns": {
+      "total_reviews": 2,
+      "unique_reviews": 2,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [
+        {
+          "phrase": "grabbed these during",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "these during a",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "during a flash",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "a flash sale,",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "flash sale, betting",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "sale, betting on",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "betting on solid",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "on solid value",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "solid value for",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "value for weekend",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "for weekend errands.",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "weekend errands. cushioning",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "errands. cushioning starts",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "cushioning starts decent",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "starts decent but",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "decent but turns",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "but turns stiff",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "turns stiff by",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "stiff by midday.",
+          "count": 1,
+          "frequency": 0.5
+        },
+        {
+          "phrase": "by midday. materials",
+          "count": 1,
+          "frequency": 0.5
+        }
+      ],
+      "has_repetition_issues": true
+    },
+    "length_distribution": {
+      "avg_length": 46.5,
+      "std_length": 1.5,
+      "min_length": 45,
+      "max_length": 48,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 0,
+        "fit": 0,
+        "quality": 0,
+        "style": 0,
+        "durability": 1,
+        "price": 0,
+        "sizing": 2
+      },
+      "reviews_with_aspects": 2,
+      "total_reviews": 2,
+      "coverage_rate": 1.0,
+      "avg_mentions_per_aspect": 0.43,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 66.54,
+      "min_score": 62.34,
+      "max_score": 70.75,
+      "interpretation": "Standard",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 2,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 2,
+      "total_reviews": 2,
+      "pronoun_usage_rate": 1.0,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": null,
+  "recommendations": [
+    "Rating distribution deviates from expected. Adjust generation parameters or sampling.",
+    "Repetitive phrases detected. Increase generation diversity or use more varied prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 2,
+    "shoe_related_count": 2,
+    "shoe_related_percentage": 100.0,
+    "avg_relevance_score": 0.9081632653061225,
+    "avg_keyword_count": 5.5,
+    "flagged_reviews": [],
+    "flagged_count": 0
+  }
+}
