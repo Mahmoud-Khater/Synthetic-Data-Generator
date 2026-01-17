@@ -322,10 +322,16 @@ max_attempts: 4           # Maximum generation attempts per review
 
 ### Current Implementation
 
-| Model | Speed | Quality  | Status |
-|-------|-------|---------|--------|
-| **Grok-4-Fast** | Very Fast | Excellent | Primary |
-| **GPT-4.1-mini** | Fast | Outstanding | Fallback |
+| Model | Generation Time | Quality | Pass Rate | Status |
+|-------|----------------|---------|-----------|--------|
+| **Grok-4-Fast** | ~2-5s | Good | ~75% | Primary |
+| **GPT-4.1-mini** | ~2-5s | Excellent | ~90% | Fallback |
+
+**Key Findings:**
+- Both models have similar generation times (~2-5 seconds per review)
+- GPT-4.1-mini produces higher quality reviews with better pass rates
+- Grok is used first for speed, GPT-4.1-mini provides quality backup
+- Cascading strategy ensures best balance of speed and quality
 
 ### Domain-Specific Models Explored
 
