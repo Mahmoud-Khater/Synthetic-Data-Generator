@@ -1,7 +1,7 @@
 # Configuration for synthetic review generation
 
 # Number of reviews to generate
-num_reviews: 100
+num_reviews: 400
 
 # Maximum attempts per review (for cascading fallback)
 # Attempt 1: DeepSeek, Attempt 2: Real Review, Attempt 3: Azure OpenAI, Attempt 4+: Real Review
