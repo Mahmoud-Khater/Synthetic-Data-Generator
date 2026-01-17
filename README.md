@@ -471,16 +471,16 @@ Overall Score: 61.3/100 - D (Poor)
 ### 4. Visualization Plots
 
 #### Sentiment Comparison
-![Sentiment Distribution](reports/report_20260117_022945/sentiment_comparison.png)
+![Sentiment Distribution](reports/report_20260117_142120/sentiment_comparison.png)
 
 #### Length Distribution
-![Length Distribution](reports/report_20260117_022945/length_distribution.png)
+![Length Distribution](reports/report_20260117_142120/length_distribution.png)
 
 #### Rating Distribution
-![Rating Distribution](reports/report_20260117_022945/rating_distribution.png)
+![Rating Distribution](reports/report_20260117_142120/rating_distribution.png)
 
 #### Distribution Analysis
-![Combined Analysis](reports/report_20260117_022945/distribution_analysis.png)
+![Combined Analysis](reports/report_20260117_142120/distribution_analysis.png)
 
 ---
 

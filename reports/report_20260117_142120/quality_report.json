@@ -1,0 +1,168 @@
+{
+  "metadata": {
+    "generated_at": "2026-01-17T14:21:32.841727",
+    "num_synthetic_reviews": 400,
+    "num_real_reviews": 398,
+    "provider": "unknown"
+  },
+  "quality_score": {
+    "overall": 67.8,
+    "breakdown": {
+      "diversity": 27.66,
+      "bias": 70,
+      "realism": 100
+    },
+    "grade": "D (Poor)"
+  },
+  "diversity": {
+    "vocabulary": {
+      "type_token_ratio": 0.115,
+      "unique_tokens": 2337,
+      "total_tokens": 20319,
+      "avg_unique_per_review": 46.99,
+      "top_10_token_ratio": 0.1941
+    },
+    "semantic_similarity": {
+      "avg_similarity": 0.5619,
+      "max_similarity": 0.7899,
+      "min_similarity": 0.3022,
+      "std_similarity": 0.1063
+    },
+    "tfidf_similarity": {
+      "avg_tfidf_similarity": 0.0535,
+      "std_tfidf_similarity": 0.0498
+    }
+  },
+  "bias": {
+    "rating_distribution": {
+      "actual_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "expected_distribution": {
+        "0": 0.1,
+        "1": 0.15,
+        "2": 0.3,
+        "3": 0.25,
+        "4": 0.2
+      },
+      "deviations": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0
+      },
+      "total_deviation": 0.0,
+      "is_biased": false
+    },
+    "sentiment_consistency": {
+      "total_reviews": 400,
+      "inconsistencies_found": 1,
+      "inconsistency_rate": 0.0025,
+      "is_consistent": true,
+      "examples": [
+        {
+          "rating": 3,
+          "issue": "High rating but negative sentiment",
+          "pos_words": 0,
+          "neg_words": 1
+        }
+      ]
+    },
+    "repetitive_patterns": {
+      "total_reviews": 400,
+      "unique_reviews": 400,
+      "duplicate_rate": 0.0,
+      "repetitive_phrases": [],
+      "has_repetition_issues": false
+    },
+    "length_distribution": {
+      "avg_length": 51.56,
+      "std_length": 7.76,
+      "min_length": 27,
+      "max_length": 74,
+      "is_too_uniform": true
+    },
+    "overall_bias_detected": true
+  },
+  "realism": {
+    "aspect_coverage": {
+      "aspect_mentions": {
+        "comfort": 227,
+        "fit": 44,
+        "quality": 130,
+        "style": 29,
+        "durability": 111,
+        "price": 17,
+        "sizing": 152
+      },
+      "reviews_with_aspects": 339,
+      "total_reviews": 400,
+      "coverage_rate": 0.8475,
+      "avg_mentions_per_aspect": 101.43,
+      "has_good_coverage": true
+    },
+    "readability": {
+      "avg_flesch_score": 53.75,
+      "min_score": 3.79,
+      "max_score": 91.86,
+      "interpretation": "Fairly Difficult",
+      "is_natural": true
+    },
+    "ai_patterns": {
+      "reviews_with_ai_patterns": 0,
+      "total_reviews": 400,
+      "ai_pattern_rate": 0.0,
+      "is_realistic": true,
+      "examples": []
+    },
+    "pronoun_usage": {
+      "reviews_with_pronouns": 351,
+      "total_reviews": 400,
+      "pronoun_usage_rate": 0.8775,
+      "is_natural": true
+    },
+    "overall_realistic": true
+  },
+  "comparison_with_real": {
+    "vocabulary": {
+      "synthetic_ttr": 0.115,
+      "real_ttr": 0.1394,
+      "ttr_difference": 0.0244
+    },
+    "length": {
+      "synthetic_avg": 51.56,
+      "real_avg": 32.78,
+      "length_difference": 18.79
+    },
+    "similarity_to_real": {
+      "avg_max_similarity": 0.6633,
+      "min_similarity": 0.4245,
+      "max_similarity": 0.8102,
+      "interpretation": "High similarity (>0.7) may indicate copying; very low (<0.3) may indicate unrealistic content"
+    }
+  },
+  "recommendations": [
+    "Limited vocabulary diversity. Encourage more varied word choices in prompts."
+  ],
+  "domain_validation": {
+    "total_reviews": 400,
+    "shoe_related_count": 399,
+    "shoe_related_percentage": 99.75,
+    "avg_relevance_score": 0.9696105966479404,
+    "avg_keyword_count": 7.9475,
+    "flagged_reviews": [
+      {
+        "index": 386,
+        "text": "Picked these up for my morning commutes and couldn't be happier. They cradle my feet all day without...",
+        "relevance_score": 0.0,
+        "keyword_count": 0
+      }
+    ],
+    "flagged_count": 1
+  }
+}

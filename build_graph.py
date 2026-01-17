@@ -65,7 +65,7 @@ def generate_review_node(state: ReviewState) -> ReviewState:
     attempt_idx = state['attempt']
     max_attempts = state['max_attempts']
     
-    print(f"\n🔄 Attempt {attempt_idx + 1}/{max_attempts}: ", end="")
+    print(f"\nAttempt {attempt_idx + 1}/{max_attempts}: ", end="")
     
     real_reviews = []
     current_generator = None
@@ -143,12 +143,12 @@ def generate_review_node(state: ReviewState) -> ReviewState:
                 persona=state['persona'],
                 real_reviews=real_reviews
             )
-            print(f"✅ Generated review: {review[:80]}...")
+            print(f"Generated review: {review[:80]}...")
             state['review'] = review
             state['is_real_review'] = False  # Mark as generated (not real)
             state['generator_used'] = current_generator.get_provider_name()  # Track which generator
         except Exception as e:
-            print(f"❌ Generation failed: {str(e)}")
+            print(f"Generation failed: {str(e)}")
             # Mark as failed so it will retry with next strategy
             state['review'] = None
             state['is_real_review'] = False
@@ -164,7 +164,7 @@ def guardrail_check_node(state: ReviewState) -> ReviewState:
     
     # Skip quality check for real reviews (they're already authentic)
     if state.get('is_real_review', False):
-        print("✅ Using real review - skipping quality check")
+        print("Using real review - skipping quality check")
         state['quality_assessment'] = {
             'pass': True,
             'overall_score': 10.0,
@@ -172,7 +172,7 @@ def guardrail_check_node(state: ReviewState) -> ReviewState:
         }
         return state
     
-    print(f"🔍 Reviewing generated content...")
+    print(f"Reviewing generated content...")
     
     try:
         assessment = reviewer.review_generated_content(
@@ -181,7 +181,7 @@ def guardrail_check_node(state: ReviewState) -> ReviewState:
             persona=state["persona"]
         )
         
-        print(f"📊 Quality Assessment:")
+        print(f"Quality Assessment:")
         print(f"   - Overall Score: {assessment.get('overall_score', 0)}/10")
         print(f"   - Pass: {assessment.get('pass', False)}")
         
@@ -213,7 +213,7 @@ def guardrail_check_node(state: ReviewState) -> ReviewState:
         }
         
     except Exception as e:
-        print(f"⚠️  Error during review: {str(e)}")
+        print(f"Error during review: {str(e)}")
         # If review fails, mark as failed assessment
         failed_assessment = {
             "pass": False,
@@ -254,7 +254,7 @@ def check_quality_transition(state: ReviewState) -> str:
         if attempt_history:
             # Select attempt with highest quality score
             best_attempt = max(attempt_history, key=lambda x: x.get("quality_score", 0))
-            print(f"📊 Selecting best review from attempt {best_attempt['attempt_number']} (score: {best_attempt.get('quality_score', 0)}/10)")
+            print(f"Selecting best review from attempt {best_attempt['attempt_number']} (score: {best_attempt.get('quality_score', 0)}/10)")
             
             # Use the best review
             state["review"] = best_attempt["review_text"]
@@ -266,7 +266,7 @@ def check_quality_transition(state: ReviewState) -> str:
         
         return "give_up"
     else:
-        print(f"🔄 Quality check failed. Retrying...")
+        print(f"Quality check failed. Retrying...")
         return "retry"
 
 
@@ -420,7 +420,7 @@ def generate_batch_reviews(personas: List[Dict], num_reviews: int = 10, max_atte
             
             for i in range(needed):
                 persona = random.choice(personas)
-                rating = select_rating(rating_distribution)
+                rating = fixed_sampler.get_next_rating(rating_distribution, num_reviews) # Use the sampler instance
                 
                 result = run_review_generation(persona, rating, max_attempts)
                 
